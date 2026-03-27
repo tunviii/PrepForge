@@ -1,0 +1,20 @@
+{
+  "name": "ai-interview-backend",
+  "version": "1.0.0",
+  "description": "Backend server for AI Interview Practice",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^4.19.2",
+    "firebase-admin": "^13.7.0",
+    "groq-sdk": "^0.7.0",
+    "mongodb": "^7.1.0",
+    "mongoose": "^9.3.1"
+  }
+}

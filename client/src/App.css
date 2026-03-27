@@ -1,0 +1,314 @@
+/* ═══════════════════════════════════════════════
+   PREPFORGE — Global Styles
+   Shared across all pages
+═══════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* ── CSS VARIABLES ── */
+:root {
+  --green: #00ff99;
+  --green-dim: rgba(0, 255, 153, 0.12);
+  --green-glow: rgba(0, 255, 153, 0.25);
+  --bg: #060a0f;
+  --surface: rgba(255, 255, 255, 0.04);
+  --border: rgba(255, 255, 255, 0.08);
+  --text-muted: #6b7a8d;
+  --text-mid: #a0aec0;
+}
+
+/* ── RESET ── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── ANIMATED BACKGROUND CANVAS ── */
+.bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.bg-canvas::before {
+  content: '';
+  position: absolute;
+  width: 800px;
+  height: 800px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 255, 120, 0.07) 0%, transparent 70%);
+  top: -200px;
+  left: -200px;
+  animation: drift1 18s ease-in-out infinite alternate;
+}
+
+.bg-canvas::after {
+  content: '';
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 180, 255, 0.06) 0%, transparent 70%);
+  bottom: -100px;
+  right: -100px;
+  animation: drift2 22s ease-in-out infinite alternate;
+}
+
+@keyframes drift1 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(80px, 60px) scale(1.15); }
+}
+
+@keyframes drift2 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(-60px, -40px) scale(1.2); }
+}
+
+/* ── STATIC BACKGROUND GLOW (used in test/interview pages) ── */
+.bg-glow {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.bg-glow::before {
+  content: '';
+  position: absolute;
+  width: 55vw;
+  height: 55vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 255, 100, 0.07) 0%, transparent 65%);
+  top: -18vw;
+  left: -14vw;
+}
+
+.bg-glow::after {
+  content: '';
+  position: absolute;
+  width: 45vw;
+  height: 45vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 160, 255, 0.055) 0%, transparent 65%);
+  bottom: -12vw;
+  right: -10vw;
+}
+
+/* ── GRID OVERLAY ── */
+.grid-overlay,
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0, 255, 153, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 153, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(0, 255, 153, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 153, 0.025) 1px, transparent 1px);
+  background-size: 55px 55px;
+  mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 20%, transparent 100%);
+}
+
+/* ── NAV LOGO (top-left, fixed) ── */
+.nav-logo {
+  position: fixed;
+  top: 26px;
+  left: 36px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.logo-mark {
+  width: 34px;
+  height: 34px;
+  background: var(--green);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+  color: #060a0f;
+  box-shadow: 0 0 18px var(--green-glow);
+}
+
+.logo-text {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  color: white;
+}
+
+.logo-text span {
+  color: var(--green);
+}
+
+/* ── TOP-RIGHT AUTH AREA ── */
+.top-right {
+  position: fixed;
+  top: 24px;
+  right: 36px;
+  z-index: 100;
+}
+
+.nav-register-btn,
+.register-btn {
+  background: var(--green);
+  color: #060a0f;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.nav-register-btn:hover,
+.register-btn:hover {
+  box-shadow: 0 0 20px var(--green-glow);
+  transform: translateY(-1px);
+}
+
+/* ── PROFILE CIRCLE + DROPDOWN ── */
+.profile-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-circle {
+  width: 42px;
+  height: 42px;
+  background: var(--green);
+  color: #060a0f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 700;
+  font-family: 'Syne', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 0 16px var(--green-glow);
+  font-size: 16px;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 55px;
+  background: #0d1117;
+  border-radius: 12px;
+  width: 190px;
+  border: 1px solid var(--border);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  z-index: 200;
+}
+
+.dropdown div {
+  padding: 13px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 12px;
+  transition: background 0.15s;
+}
+
+.dropdown div:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ── BADGE DOT ANIMATION ── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.3; transform: scale(0.6); }
+}
+
+/* ── FADE-UP ANIMATION ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.section-label::before,
+.section-label::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 60px;
+  height: 1px;
+}
+
+.section-label::before {
+  right: calc(50% + 90px);
+  background: linear-gradient(to left, transparent, var(--border));
+}
+
+.section-label::after {
+  left: calc(50% + 90px);
+  background: linear-gradient(to right, transparent, var(--border));
+}
+
+/* ── CHECK ICON ── */
+.check {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  background: var(--green-dim);
+  border: 1px solid rgba(0, 255, 153, 0.3);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+.check svg {
+  width: 10px;
+  height: 10px;
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 2.5;
+}
