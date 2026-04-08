@@ -7,7 +7,9 @@ const userSchema = new mongoose.Schema({
     unique: true
   },
   name: String,
-  email: String
+  email: String,
+  college: String,
+  branch: String
 }, { timestamps: true });
 
 export default mongoose.model("User", userSchema);

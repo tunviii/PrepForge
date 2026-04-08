@@ -26,7 +26,8 @@
   box-sizing: border-box;
 }
 
-body {
+html,body,#root {
+  height: 100%;
   background: var(--bg);
   color: white;
   font-family: 'DM Sans', sans-serif;

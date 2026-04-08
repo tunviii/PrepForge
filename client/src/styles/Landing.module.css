@@ -1,22 +1,22 @@
 /* ═══════════════════════════════════════════════
-   PREPFORGE — Landing.css
-   Styles for Landing.jsx
+   PREPFORGE — Landing.module.css
+   Scoped styles for Landing.jsx
 ═══════════════════════════════════════════════ */
 
 /* ── LANDING SECTION WRAPPER ── */
-#landingSection {
+.landingSection {
   position: relative;
   z-index: 1;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 100px 20px 60px;
 }
 
 /* ── INNER CONTAINER ── */
-#landingSection .container {
+.landingSection .container {
   width: 100%;
   max-width: 860px;
   margin: 0 auto;
@@ -47,7 +47,7 @@
   text-transform: uppercase;
 }
 
-.badge-dot {
+.badgeDot {
   width: 6px;
   height: 6px;
   background: var(--green);
@@ -55,9 +55,8 @@
   animation: pulse 2s ease-in-out infinite;
 }
 
-/* ── SITE NAME (H1) ── */
-h1,
-.site-name {
+/* ── SITE NAME ── */
+.siteName {
   font-family: 'Syne', sans-serif;
   font-size: clamp(52px, 8vw, 90px);
   font-weight: 800;
@@ -66,14 +65,13 @@ h1,
   margin-bottom: 6px;
 }
 
-h1 .highlight,
-.site-name .accent {
+.siteName .accent,
+.accent {
   color: var(--green);
 }
 
 /* ── TAGLINE / SUBTITLE ── */
-.subtitle,
-.site-tagline {
+.siteTagline {
   font-family: 'Syne', sans-serif;
   font-size: clamp(16px, 2.5vw, 22px);
   font-weight: 600;
@@ -84,7 +82,7 @@ h1 .highlight,
 }
 
 /* ── HERO DESCRIPTION ── */
-.hero-desc {
+.heroDesc {
   color: var(--text-mid);
   font-size: 16px;
   line-height: 1.7;
@@ -93,8 +91,7 @@ h1 .highlight,
 }
 
 /* ── FEATURE PILLS ROW ── */
-.features,
-.feature-pills {
+.featurePills {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -102,7 +99,6 @@ h1 .highlight,
   margin-bottom: 16px;
 }
 
-.features div,
 .pill {
   display: flex;
   align-items: center;
@@ -115,8 +111,8 @@ h1 .highlight,
   color: var(--text-mid);
 }
 
-/* ── SECTION TITLE (re-used inside landing) ── */
-.section-title {
+/* ── SECTION TITLE ── */
+.sectionTitle {
   font-family: 'Syne', sans-serif;
   font-size: 11px;
   font-weight: 700;
@@ -128,8 +124,8 @@ h1 .highlight,
   position: relative;
 }
 
-.section-title::before,
-.section-title::after {
+.sectionTitle::before,
+.sectionTitle::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -137,12 +133,12 @@ h1 .highlight,
   height: 1px;
 }
 
-.section-title::before {
+.sectionTitle::before {
   right: calc(50% + 90px);
   background: linear-gradient(to left, transparent, var(--border));
 }
 
-.section-title::after {
+.sectionTitle::after {
   left: calc(50% + 90px);
   background: linear-gradient(to right, transparent, var(--border));
 }
@@ -195,8 +191,8 @@ h1 .highlight,
   opacity: 1;
 }
 
-/* card glow orb */
-.card-glow {
+/* ── CARD GLOW ── */
+.cardGlow {
   position: absolute;
   width: 200px;
   height: 200px;
@@ -207,8 +203,8 @@ h1 .highlight,
   pointer-events: none;
 }
 
-/* standalone card heading (used when icon is above, not beside) */
-.card-title-text {
+/* ── CARD TITLE TEXT ── */
+.cardTitleText {
   font-family: 'Syne', sans-serif;
   font-size: 20px;
   font-weight: 700;
@@ -216,16 +212,17 @@ h1 .highlight,
   margin-bottom: 8px;
 }
 
-/* card header row (icon + title side by side) */
-.card-title {
+/* ── CARD TITLE ROW (icon + title side by side) ── */
+.cardTitle {
   display: flex;
   align-items: center;
   gap: 14px;
   margin-bottom: 8px;
 }
 
-.card-icon,
-.card-icon-wrap {
+/* ── CARD ICON ── */
+.cardIcon,
+.cardIconWrap {
   width: 52px;
   height: 52px;
   background: var(--green-dim);
@@ -238,23 +235,23 @@ h1 .highlight,
   flex-shrink: 0;
 }
 
-.card-title h3 {
+.cardTitle h3 {
   font-family: 'Syne', sans-serif;
   font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 
-/* card description */
+/* ── CARD DESCRIPTION ── */
 .card > p,
-.card-desc {
+.cardDesc {
   color: var(--text-muted);
   font-size: 14px;
   line-height: 1.6;
   margin-bottom: 28px;
 }
 
-/* card feature list */
+/* ── CARD FEATURE LIST ── */
 .card ul {
   list-style: none;
   padding: 0;
@@ -287,8 +284,8 @@ h1 .highlight,
   background-size: 10px 10px;
 }
 
-/* card CTA footer */
-.card-cta {
+/* ── CARD CTA ── */
+.cardCta {
   margin-top: 32px;
   display: flex;
   align-items: center;
@@ -297,14 +294,15 @@ h1 .highlight,
   border-top: 1px solid var(--border);
 }
 
-.card-cta-text {
+.cardCtaText {
   font-family: 'Syne', sans-serif;
   font-size: 14px;
   font-weight: 600;
   color: var(--green);
 }
 
-.card-arrow {
+/* ── CARD ARROW ── */
+.cardArrow {
   width: 32px;
   height: 32px;
   background: var(--green-dim);
@@ -315,16 +313,16 @@ h1 .highlight,
   transition: background 0.2s, transform 0.2s;
 }
 
-.card:hover .card-arrow {
+.card:hover .cardArrow {
   background: var(--green);
   transform: translateX(3px);
 }
 
-.card:hover .card-arrow svg {
+.card:hover .cardArrow svg {
   stroke: #060a0f;
 }
 
-.card-arrow svg {
+.cardArrow svg {
   width: 14px;
   height: 14px;
   fill: none;
@@ -333,7 +331,7 @@ h1 .highlight,
 }
 
 /* ── MODE BADGE (FREE / PRO) ── */
-.mode-badge {
+.modeBadge {
   position: absolute;
   top: 18px;
   right: 18px;
@@ -345,20 +343,20 @@ h1 .highlight,
   border-radius: 50px;
 }
 
-.mode-badge.free {
+.modeBadge.free {
   background: rgba(0, 255, 153, 0.1);
   color: var(--green);
   border: 1px solid rgba(0, 255, 153, 0.2);
 }
 
-.mode-badge.pro {
+.modeBadge.pro {
   background: rgba(255, 190, 0, 0.1);
   color: #ffbe00;
   border: 1px solid rgba(255, 190, 0, 0.2);
 }
 
 /* ── STATS BAR ── */
-.stats-bar {
+.statsBar {
   display: flex;
   gap: 48px;
   justify-content: center;
@@ -373,7 +371,7 @@ h1 .highlight,
   text-align: center;
 }
 
-.stat-num {
+.statNum {
   font-family: 'Syne', sans-serif;
   font-size: 28px;
   font-weight: 800;
@@ -381,7 +379,7 @@ h1 .highlight,
   letter-spacing: -0.02em;
 }
 
-.stat-label {
+.statLabel {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 3px;
@@ -390,14 +388,14 @@ h1 .highlight,
 }
 
 /* ── COMPANY TICKER ── */
-.ticker-section {
+.tickerSection {
   position: relative;
   z-index: 1;
   padding: 40px 0 70px;
   overflow: hidden;
 }
 
-.ticker-label {
+.tickerLabel {
   text-align: center;
   font-family: 'Syne', sans-serif;
   font-size: 11px;
@@ -408,13 +406,13 @@ h1 .highlight,
   margin-bottom: 28px;
 }
 
-.ticker-track-wrapper {
+.tickerTrackWrapper {
   position: relative;
   overflow: hidden;
 }
 
-.ticker-fade-left,
-.ticker-fade-right {
+.tickerFadeLeft,
+.tickerFadeRight {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -423,30 +421,25 @@ h1 .highlight,
   pointer-events: none;
 }
 
-.ticker-fade-left  { left: 0;  background: linear-gradient(to right, var(--bg), transparent); }
-.ticker-fade-right { right: 0; background: linear-gradient(to left, var(--bg), transparent); }
+.tickerFadeLeft  { left: 0;  background: linear-gradient(to right, var(--bg), transparent); }
+.tickerFadeRight { right: 0; background: linear-gradient(to left, var(--bg), transparent); }
 
-.ticker-track {
+.tickerTrack {
   overflow: hidden;
   white-space: nowrap;
 }
 
-.ticker-inner {
+.tickerInner {
   display: inline-flex;
   gap: 0;
   animation: tickerScroll 32s linear infinite;
 }
 
-.ticker-inner:hover {
+.tickerInner:hover {
   animation-play-state: paused;
 }
 
-@keyframes tickerScroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-
-.ticker-item {
+.tickerItem {
   display: inline-flex;
   align-items: center;
   gap: 12px;
@@ -461,13 +454,13 @@ h1 .highlight,
   white-space: nowrap;
 }
 
-.ticker-item:hover {
+.tickerItem:hover {
   border-color: rgba(0, 255, 153, 0.35);
   box-shadow: 0 0 18px rgba(0, 255, 153, 0.1);
   background: rgba(0, 255, 153, 0.05);
 }
 
-.company-logo {
+.companyLogo {
   width: 32px;
   height: 32px;
   display: flex;
@@ -476,15 +469,37 @@ h1 .highlight,
   flex-shrink: 0;
 }
 
-.company-logo svg {
+.companyLogo svg {
   width: 100%;
   height: 100%;
 }
 
-.company-name {
+.companyName {
   font-family: 'Syne', sans-serif;
   font-size: 15px;
   font-weight: 700;
   color: #d0dae8;
   letter-spacing: -0.01em;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+@keyframes tickerScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
