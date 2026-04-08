@@ -1,90 +1,95 @@
 import React, { useState } from "react";
-import '../styles/Landing.css';
-
+import styles from '../styles/Landing.module.css';
+import { useNavigate } from "react-router-dom";
 function Landing({ user, logout, openPractice, openInterview, openAuth }) {
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const navigate = useNavigate();
   return (
     <>
-      <div className="bg-canvas"></div>
-      <div className="grid-overlay"></div>
+      <div className={styles.bgCanvas}></div>
+      <div className={styles.gridOverlay}></div>
 
-      {/* ── NAV LOGO ── */}
-      <div className="nav-logo">
-        <div className="logo-mark">P</div>
-        <div className="logo-text">Prep<span>Forge</span></div>
-      </div>
+      {/* ── NAVBAR ── */}
+      <nav className={styles.navbar}>
+        <div className={styles.navLogo}>
+          <div className={styles.logoMark}>P</div>
+          <div className={styles.logoText}>Prep<span className={styles.accent}>Forge</span></div>
+        </div>
 
-      {/* ── TOP RIGHT AUTH ── */}
-      <div className="top-right">
-        {!user ? (
-          <button className="register-btn" onClick={openAuth}>
-            Get Started →
-          </button>
-        ) : (
-          <div className="profile-container">
-            <div
-              className="profile-circle"
-              onClick={() => setMenuOpen(!menuOpen)}
-            >
-              {(user?.name || user?.email || "U")[0].toUpperCase()}
-            </div>
-            {menuOpen && (
-              <div className="dropdown">
-                <div onClick={() => alert("Leaderboard coming soon")}>🏆 Leaderboard</div>
-                <div onClick={() => alert("Progress dashboard coming soon")}>📊 Your Progress</div>
-                <div onClick={logout}>🚪 Logout</div>
+        <div className={styles.navRight}>
+          {!user ? (
+            <button className={styles.registerBtn} onClick={openAuth}>
+              Get Started →
+            </button>
+          ) : (
+            <div className={styles.profileContainer}>
+              <div
+                className={styles.profileCircle}
+                onClick={() => setMenuOpen(!menuOpen)}
+              >
+                {(user?.name || user?.email || "U")[0].toUpperCase()}
               </div>
-            )}
-          </div>
-        )}
-      </div>
+              {menuOpen && (
+                <div className={styles.dropdown}>
+                  <div className={styles.dropdownItem} onClick={() => alert("Leaderboard coming soon")}>🏆 Leaderboard</div>
+                  <div className={styles.dropdownItem} onClick={() => { setMenuOpen(false); navigate("/dashboard"); }}>
+  📊 Your Progress
+</div>
+                  <div className={styles.dropdownItem} onClick={logout}>🚪 Logout</div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </nav>
 
       {/* ── LANDING SECTION ── */}
-      <div id="landingSection">
-        <div style={{ width: "100%", maxWidth: "860px", margin: "0 auto" }}>
+      <div id="landingSection" className={styles.landingSection}>
+        <div className={styles.container}>
 
           {/* HERO */}
-          <div className="hero">
-            <div className="badge">
-              <div className="badge-dot"></div>
+          <div className={styles.hero}>
+            <div className={styles.badge}>
+              <div className={styles.badgeDot}></div>
               AI-Powered Interview Prep
             </div>
-            <div className="site-name">Prep<span className="accent">Forge</span></div>
-            <div className="site-tagline">Forge Your Interview Edge</div>
-            <p className="hero-desc">
+            <div className={styles.siteName}>Prep<span className={styles.accent}>Forge</span></div>
+            <div className={styles.siteTagline}>Forge Your Interview Edge</div>
+            <p className={styles.heroDesc}>
               From DSA and system design to behavioral, HR, and company-specific rounds —
               PrepForge covers every question type with instant AI feedback so you walk in
               ready for anything.
             </p>
-            <div className="feature-pills">
-              <div className="pill">💻 DSA &amp; System Design</div>
-              <div className="pill">🧠 Behavioral &amp; HR</div>
-              <div className="pill">🏢 Company-Specific Prep</div>
-              <div className="pill">⚡ Real-time AI Feedback</div>
+            <div className={styles.featurePills}>
+              <div className={styles.pill}>💻 DSA &amp; System Design</div>
+              <div className={styles.pill}>🧠 Behavioral &amp; HR</div>
+              <div className={styles.pill}>🏢 Company-Specific Prep</div>
+              <div className={styles.pill}>⚡ Real-time AI Feedback</div>
             </div>
           </div>
 
           {/* MODE SELECTOR */}
-          <div className="section-label">Choose Your Interview Mode</div>
-          <div className="cards">
+          <div className={styles.sectionTitle}>Choose Your Interview Mode</div>
+          <div className={styles.cards}>
 
             {/* PRACTICE CARD */}
-            <div className="card" onClick={openPractice}>
-              <div className="card-glow"></div>
-              <span className="mode-badge free">Free</span>
-              <div className="card-icon-wrap">📘</div>
-              <div className="card-title-text">Practice Mode</div>
-              <p className="card-desc">Learn at your own pace with instant feedback after every answer.</p>
-              <ul>
+            <div className={`${styles.card} ${styles.clickable}`} onClick={openPractice}>
+              <div className={styles.cardGlow}></div>
+              <span className={`${styles.modeBadge} ${styles.free}`}>Free</span>
+              <div className={styles.cardHeader}>
+                <div className={styles.cardIconWrap}>📘</div>
+                <div className={styles.cardTitleText}>Practice Mode</div>
+              </div>
+              <p className={styles.cardDesc}>Learn at your own pace with instant feedback after every answer.</p>
+              <ul className={styles.cardList}>
                 <li>DSA, behavioral &amp; HR questions</li>
                 <li>Get scored after every answer</li>
                 <li>See improved sample answers</li>
                 <li>No time pressure</li>
               </ul>
-              <div className="card-cta">
-                <span className="card-cta-text">Start Practicing</span>
-                <div className="card-arrow">
+              <div className={styles.cardCta}>
+                <span className={styles.cardCtaText}>Start Practicing</span>
+                <div className={styles.cardArrow}>
                   <svg viewBox="0 0 14 14">
                     <line x1="2" y1="7" x2="12" y2="7" />
                     <polyline points="8,3 12,7 8,11" />
@@ -94,21 +99,23 @@ function Landing({ user, logout, openPractice, openInterview, openAuth }) {
             </div>
 
             {/* TEST CARD */}
-            <div className="card" onClick={openInterview}>
-              <div className="card-glow"></div>
-              <span className="mode-badge pro">Simulated</span>
-              <div className="card-icon-wrap">📋</div>
-              <div className="card-title-text">Test Mode</div>
-              <p className="card-desc">Simulate a real 45–60 min company-specific interview under pressure.</p>
-              <ul>
+            <div className={`${styles.card} ${styles.clickable}`} onClick={openInterview}>
+              <div className={styles.cardGlow}></div>
+              <span className={`${styles.modeBadge} ${styles.pro}`}>Simulated</span>
+              <div className={styles.cardHeader}>
+                <div className={styles.cardIconWrap}>📋</div>
+                <div className={styles.cardTitleText}>Test Mode</div>
+              </div>
+              <p className={styles.cardDesc}>Simulate a real 45–60 min company-specific interview under pressure.</p>
+              <ul className={styles.cardList}>
                 <li>4–5 mixed-round questions</li>
                 <li>No hints during interview</li>
                 <li>Comprehensive final report</li>
                 <li>Hire recommendation included</li>
               </ul>
-              <div className="card-cta">
-                <span className="card-cta-text">Take the Test</span>
-                <div className="card-arrow">
+              <div className={styles.cardCta}>
+                <span className={styles.cardCtaText}>Take the Test</span>
+                <div className={styles.cardArrow}>
                   <svg viewBox="0 0 14 14">
                     <line x1="2" y1="7" x2="12" y2="7" />
                     <polyline points="8,3 12,7 8,11" />
@@ -120,22 +127,22 @@ function Landing({ user, logout, openPractice, openInterview, openAuth }) {
           </div>
 
           {/* STATS */}
-          <div className="stats-bar">
-            <div className="stat">
-              <div className="stat-num">1000+</div>
-              <div className="stat-label">Interview Questions</div>
+          <div className={styles.statsBar}>
+            <div className={styles.stat}>
+              <div className={styles.statNum}>1000+</div>
+              <div className={styles.statLabel}>Interview Questions</div>
             </div>
-            <div className="stat">
-              <div className="stat-num">98%</div>
-              <div className="stat-label">AI Accuracy</div>
+            <div className={styles.stat}>
+              <div className={styles.statNum}>98%</div>
+              <div className={styles.statLabel}>AI Accuracy</div>
             </div>
-            <div className="stat">
-              <div className="stat-num">10k+</div>
-              <div className="stat-label">Mock Interviews</div>
+            <div className={styles.stat}>
+              <div className={styles.statNum}>10k+</div>
+              <div className={styles.statLabel}>Mock Interviews</div>
             </div>
-            <div className="stat">
-              <div className="stat-num">4.9★</div>
-              <div className="stat-label">User Rating</div>
+            <div className={styles.stat}>
+              <div className={styles.statNum}>4.9★</div>
+              <div className={styles.statLabel}>User Rating</div>
             </div>
           </div>
 
@@ -143,19 +150,19 @@ function Landing({ user, logout, openPractice, openInterview, openAuth }) {
       </div>
 
       {/* ── COMPANY TICKER ── */}
-      <div className="ticker-section">
-        <div className="ticker-label">Prep for questions asked at top companies</div>
-        <div className="ticker-track-wrapper">
-          <div className="ticker-fade-left"></div>
-          <div className="ticker-fade-right"></div>
-          <div className="ticker-track">
-            <div className="ticker-inner">
+      <div className={styles.tickerSection}>
+        <div className={styles.tickerLabel}>Prep for questions asked at top companies</div>
+        <div className={styles.tickerTrackWrapper}>
+          <div className={styles.tickerFadeLeft}></div>
+          <div className={styles.tickerFadeRight}></div>
+          <div className={styles.tickerTrack}>
+            <div className={styles.tickerInner}>
               {[...companies, ...companies].map((company, i) => (
-                <div className="ticker-item" key={i}>
-                  <div className="company-logo">
+                <div className={styles.tickerItem} key={i}>
+                  <div className={styles.companyLogo}>
                     <img src={company.logo} alt={company.name} width={32} height={32} style={{ borderRadius: 6 }} />
                   </div>
-                  <span className="company-name">{company.name}</span>
+                  <span className={styles.companyName}>{company.name}</span>
                 </div>
               ))}
             </div>

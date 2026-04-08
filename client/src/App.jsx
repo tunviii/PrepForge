@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 
 import Landing from "./components/Landing";
 import Practice from "./components/Practice";
 import Interview from "./components/Interview";
-import ReportScreen from './components/ReportScreen';
+import ReportScreen from "./components/ReportScreen";
 import Auth from "./components/Auth";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Dashboard from "./components/Dashboard";
+import PracticeMode from "./components/PracticeMode";
+import Topics from "./components/Topics";
 
 import { auth } from "./firebase/firebase";
 import { getCurrentUser, logoutUser } from "./services/auth";
@@ -18,56 +21,44 @@ function App() {
   const [token, setToken] = useState(null);
   const navigate = useNavigate();
 
-useEffect(() => {
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        const token = await firebaseUser.getIdToken();
+        setToken(token);
 
-  const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+        try {
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
 
-    if (firebaseUser) {
+          const data = await res.json();
 
-      const token = await firebaseUser.getIdToken();
-      setToken(token);
-
-      try {
-
-        const res = await fetch("http://localhost:5000/api/users/profile", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
+          if (data) {
+            setUser(data);
+          } else {
+            setUser({
+              name: firebaseUser.displayName,
+              email: firebaseUser.email,
+            });
           }
-        });
-
-        const data = await res.json();
-
-        if (data) {
-          setUser(data); 
-        } else {
-          
+        } catch (err) {
           setUser({
             name: firebaseUser.displayName,
-            email: firebaseUser.email
+            email: firebaseUser.email,
           });
         }
-
-      } catch (err) {
-
-        
-        setUser({
-          name: firebaseUser.displayName,
-          email: firebaseUser.email
-        });
-
+      } else {
+        setUser(null);
       }
+    });
 
-    } else {
-      setUser(null);
-    }
-
-  });
-
-  return unsubscribe;
-
-}, []);
+    return unsubscribe;
+  }, []);
 
   const logout = async () => {
     await logoutUser();
@@ -76,25 +67,18 @@ useEffect(() => {
   };
 
   const openPractice = () => {
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
-
-    navigate("/practice");
+    if (!user) { navigate("/auth"); return; }
+    navigate("/practice-mode");
   };
 
   const openInterview = () => {
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
-
+    if (!user) { navigate("/auth"); return; }
     navigate("/test");
   };
 
   return (
     <Routes>
+      {/* Public routes */}
       <Route
         path="/"
         element={
@@ -121,11 +105,30 @@ useEffect(() => {
         }
       />
 
+      {/* Protected routes */}
+      <Route
+        path="/practice-mode"
+        element={
+          <ProtectedRoute user={user}>
+            <PracticeMode goBack={() => navigate("/")} />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/topics"
+        element={
+          <ProtectedRoute user={user}>
+            <Topics goBack={() => navigate("/practice-mode")} />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/practice"
         element={
           <ProtectedRoute user={user}>
-            <Practice goBack={() => navigate("/")} token={token}/>
+            <Practice goBack={() => navigate("/practice-mode")} token={token} />
           </ProtectedRoute>
         }
       />
@@ -138,19 +141,27 @@ useEffect(() => {
           </ProtectedRoute>
         }
       />
-<Route
-  path="/report"
-  element={
-    <ProtectedRoute user={user}>
-      <ReportScreen />
-    </ProtectedRoute>
-  }
-/>
 
-<Route>
-  <Route path="/" element={<Landing/>} />
-  <Route path="/report" element={<ReportScreen />} />
-</Route>
+      <Route
+        path="/report"
+        element={
+          <ProtectedRoute user={user}>
+            <ReportScreen goBack={() => navigate("/")} />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute user={user}>
+            <Dashboard goBack={() => navigate("/")} />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Catch-all */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

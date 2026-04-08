@@ -7,7 +7,7 @@ import cors from "cors";
 
 import practiceRoute from "./practice.js";
 import interviewRoute from "./Interview.js";
-
+import dashboardRoute from "./routes/dashboard.js";
 import userRoutes from "./routes/users.js";
 import mongoose from "mongoose";
 
@@ -32,6 +32,7 @@ app.use(express.json());
 app.use("/api/practice", practiceRoute);
 app.use("/api/interview", interviewRoute);
 app.use("/api/users", userRoutes);
+app.use("/api/dashboard", dashboardRoute);
 
 /* CONNECT DATABASE */
 mongoose.connect(process.env.MONGO_URI)
