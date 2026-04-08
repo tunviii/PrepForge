@@ -3,17 +3,18 @@ import styles from '../styles/Landing.module.css';
 
 function Landing({ user, logout, openPractice, openInterview, openDashboard, openAuth }) {
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const navigate = useNavigate();
   return (
     <>
-      <div className="bg-canvas"></div>
-      <div className="grid-overlay"></div>
+      <div className={styles.bgCanvas}></div>
+      <div className={styles.gridOverlay}></div>
 
-      {/* ── NAV LOGO ── */}
-      <div className="nav-logo">
-        <div className="logo-mark">P</div>
-        <div className="logo-text">Prep<span>Forge</span></div>
-      </div>
+      {/* ── NAVBAR ── */}
+      <nav className={styles.navbar}>
+        <div className={styles.navLogo}>
+          <div className={styles.logoMark}>P</div>
+          <div className={styles.logoText}>Prep<span className={styles.accent}>Forge</span></div>
+        </div>
 
       {/* ── TOP RIGHT AUTH ── */}
       <div className="top-right">
@@ -35,10 +36,19 @@ function Landing({ user, logout, openPractice, openInterview, openDashboard, ope
                 <div onClick={openDashboard}>📊 Your Progress</div>
                 <div onClick={logout}>🚪 Logout</div>
               </div>
-            )}
-          </div>
-        )}
-      </div>
+              {menuOpen && (
+                <div className={styles.dropdown}>
+                  <div className={styles.dropdownItem} onClick={() => alert("Leaderboard coming soon")}>🏆 Leaderboard</div>
+                  <div className={styles.dropdownItem} onClick={() => { setMenuOpen(false); navigate("/dashboard"); }}>
+  📊 Your Progress
+</div>
+                  <div className={styles.dropdownItem} onClick={logout}>🚪 Logout</div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </nav>
 
       {/* ── LANDING SECTION ── */}
       <div className={styles.landingSection}>

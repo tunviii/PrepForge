@@ -7,7 +7,7 @@ import {
 } from "recharts";
 import styles from "../styles/Dashboard.module.css";
 
-export default function Dashboard() {
+export default function Dashboard({goBack}) {
   const [data, setData]       = useState(null);
   const [userId, setUserId]   = useState(null);
   const [loading, setLoading] = useState(true);

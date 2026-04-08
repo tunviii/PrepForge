@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 
 import Landing from "./components/Landing";
@@ -12,6 +12,9 @@ import PracticeMode from './components/PracticeMode';
 import Topics from './components/Topics';
 import Auth from "./components/Auth";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Dashboard from "./components/Dashboard";
+import PracticeMode from "./components/PracticeMode";
+import Topics from "./components/Topics";
 
 import { auth } from "./firebase/firebase";
 import { getCurrentUser, logoutUser } from "./services/auth";
@@ -33,35 +36,24 @@ useEffect(() => {
       setUid(firebaseUser.uid);
       try {
 
-        const res = await fetch("http://localhost:5000/api/users/profile", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
+          if (data) {
+            setUser(data);
+          } else {
+            setUser({
+              name: firebaseUser.displayName,
+              email: firebaseUser.email,
+            });
           }
-        });
-
-        const data = await res.json();
-
-        if (data) {
-          setUser(data); 
-        } else {
-          
+        } catch (err) {
           setUser({
             name: firebaseUser.displayName,
-            email: firebaseUser.email
+            email: firebaseUser.email,
           });
         }
-
-      } catch (err) {
-
-        
-        setUser({
-          name: firebaseUser.displayName,
-          email: firebaseUser.email
-        });
-
+      } else {
+        setUser(null);
       }
+    });
 
     } else {
       setUser(null);
@@ -91,11 +83,7 @@ useEffect(() => {
   };
 
   const openInterview = () => {
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
-
+    if (!user) { navigate("/auth"); return; }
     navigate("/test");
   };
 
