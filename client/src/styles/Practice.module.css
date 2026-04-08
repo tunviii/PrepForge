@@ -1,0 +1,277 @@
+/* ═══════════════════════════════════════════════
+   PREPFORGE — Practice.module.css
+   Scoped styles for Practice.jsx (chat interface)
+═══════════════════════════════════════════════ */
+
+/* ── CHAT SECTION WRAPPER ── */
+.chatSection {
+  flex: 1;  
+  height: 100vh;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* ── CHAT WRAPPER ── */
+.chatWrapper {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  height: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── CHAT HEADER ── */
+.chatHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.backBtn {
+  background: transparent;
+  border: 1px solid rgba(0, 255, 153, 0.4);
+  color: var(--green);
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-right: 15px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.backBtn:hover {
+  background: var(--green-dim);
+}
+
+.chatTitle {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* ── CHAT CONTAINER ── */
+.chatContainer {
+  flex: 1;
+  background: var(--surface);
+  backdrop-filter: blur(14px);      
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  min-height: 0;
+}
+
+/* ── CHAT BOX ── */
+.chatBox {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 153, 0.2) transparent;
+}
+
+.chatBox::-webkit-scrollbar {
+  width: 5px;
+}
+
+.chatBox::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chatBox::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 153, 0.2);
+  border-radius: 3px;
+}
+
+/* ── MESSAGES ── */
+.message {
+  padding: 12px 16px;
+  margin: 12px 0;
+  border-radius: 16px;
+  max-width: 70%;
+  font-size: 14px;
+  line-height: 1.6;
+  backdrop-filter: blur(6px);
+}
+
+.message p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.message p + p {
+  margin-top: 6px;
+}
+
+/* bot */
+.bot {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+/* user */
+.user {
+  background: linear-gradient(135deg, #00ff99, #00d084);
+  color: #04210f;
+  margin-left: auto;
+  font-weight: 500;
+  box-shadow: 0 4px 20px rgba(0,255,153,0.25);
+  border-bottom-right-radius: 4px;
+}
+
+/* ── INPUT AREA ── */
+.inputArea {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+}
+
+/* FIX: removed global input selector */
+.textInput {
+  flex: 1;
+  padding: 13px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  outline: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.textInput:focus {
+  border-color: rgba(0, 255, 153, 0.4);
+}
+
+.textInput::placeholder {
+  color: var(--text-muted);
+}
+
+/* ── TEXTAREA ── */
+.chatTextarea {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  outline: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.2s;
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.5;
+}
+
+.chatTextarea:focus {
+  border-color: rgba(0, 255, 153, 0.4);
+}
+
+.chatTextarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* ── SEND BUTTON ── */
+.sendBtn {
+  padding: 12px 24px;
+  background: var(--green);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  color: #060a0f;
+  font-size: 14px;
+  transition: box-shadow 0.2s, transform 0.15s;
+  align-self: flex-end;
+}
+
+.sendBtn:hover {
+  box-shadow: 0 0 16px var(--green-glow);
+  transform: translateY(-1px);
+}
+
+/* ── IDE BUTTON ── */
+.toggleIdeBtn {
+  background: transparent;
+  border: 1px solid rgba(0, 255, 153, 0.3);
+  color: var(--green);
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  align-self: flex-start;
+}
+
+.toggleIdeBtn:hover {
+  background: var(--green-dim);
+  border-color: rgba(0, 255, 153, 0.5);
+}
+
+/* ── IDE CONTAINER ── */
+.ideContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* ── LANGUAGE SELECT ── */
+.languageSelector {
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-mid);
+  padding: 8px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+  width: 100%;
+}
+
+.languageSelector option {
+  background: #0d1117;
+  color: white;
+}
+
+/* ── INPUT ROW ── */
+.inputRow {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.inputRow .sendBtn {
+  align-self: auto;
+}
+
+/* ── DUAL INPUT ── */
+.dualInputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
