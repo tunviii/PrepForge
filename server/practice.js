@@ -14,53 +14,76 @@ const groq = new Groq({
    SYSTEM PROMPT
 ================================ */
 
-const systemPrompt = `
-You are a campus placement technical interviewer for a Software Engineering role.
+function generateSystemPrompt(mode, topics) {
 
-Your behavior:
+  // 🔥 CASE 1: Topic-based mode
+  if (mode === "topics" && topics?.length > 0) {
+    return `
+You are a technical interviewer.
+
+The candidate has chosen to practice ONLY the following topics:
+${Array.isArray(topics) ? topics.join(", ") : "General Topics"}
+
+STRICT RULES:
+- Ask questions ONLY from these topics
+- Do NOT ask anything outside these topics
+- Stay within DSA if topics are DSA-related
+- Do NOT include HR, OS, DBMS unless explicitly selected
+- Ask follow-up questions within the same topic
+- Increase difficulty gradually
+
+Behavior:
 - Professional
 - Structured
-- Slightly pressuring but respectful
-- Focused on fundamentals
-
-Interview Structure:
-
-Stage 1: Introduction
-- Ask the candidate to introduce themselves.
-- Ask about projects and tech stack.
-
-Stage 2: DSA Round (2–3 questions)
-- Focus on arrays, strings, linked list, stack, trees.
-- Moderate difficulty (campus level).
-- Ask about time and space complexity.
-- If answer is incomplete, ask follow-up.
-
-Stage 3: CS Fundamentals
-- Ask from OOPS, DBMS, OS, CN.
-- Conceptual clarity questions.
-
-Stage 4: Behavioral
-- Ask one HR question (strengths, weaknesses, teamwork).
-
-Stage 5: Final Evaluation
-- Provide:
-    - Total score out of 10
-    - Strengths
-    - Weak areas
-    - Hire / Strong Hire / Borderline / Reject decision
-    - Short feedback summary
+- Slightly challenging
 
 Rules:
-- Ask only one question at a time.
-- Do not jump stages randomly.
-- Do not ask extremely advanced FAANG-level problems.
-- Keep responses concise and structured.
-- Do not invent a personal interviewer name unless it is explicitly provided.
-- Always ask the next question at the end of the response.
-- If evaluating an answer, first provide feedback briefly, then ask the next question.
+- Ask ONE question at a time
+- After each answer:
+  → Give short feedback
+  → Ask next question from SAME topic
+- Do NOT jump randomly between topics
+-If the user asks or answers something outside selected topics:
+→ Politely redirect them back to the selected topics.
+End:
+- Give score out of 10
+- Strengths
+- Weak areas
 `;
+  }
 
-const welcomeMessage = `Greetings! Welcome to your technical interview practice session. 
+  // 🔥 CASE 2: Full interview (default)
+  return `
+You are a campus placement technical interviewer.
+
+Follow full interview structure:
+- DSA
+- CS Fundamentals
+- Behavioral
+
+Rules:
+- Ask one question at a time
+- Keep it structured
+`;
+}
+
+function generateWelcomeMessage(mode, topics) {
+  if (mode === "topics" && topics?.length > 0) {
+    return `
+Welcome to your focused interview practice.
+
+We will ONLY cover:
+${Array.isArray(topics) ? topics.join(", ") : "General Topics"}
+
+Let’s begin.
+
+Question 1:
+Introduce yourself and your experience with these topics.
+`;
+  }
+
+  return `
+Greetings! Welcome to your technical interview practice session. 
 
 
 I’ll be conducting your technical interview today.
@@ -72,24 +95,33 @@ Please answer clearly and walk me through your thought process when solving prob
 Let’s begin.
 
 Question 1:
-Could you introduce yourself and briefly describe your programming background?`
-
-
+Could you introduce yourself and briefly describe your programming background?
+`;
+}
 
 /* ===============================
    START INTERVIEW
 ================================ */
 
 
-router.get("/start", verifyFirebaseToken, async (req, res) => {
+router.post("/start", verifyFirebaseToken, async (req, res) => {
   try {
-    console.log("START HIT"); // 👈 add this
 
-    const userId = req.user.uid || "test-user";
-    console.log("USER ID:", userId); // 👈 add this
+    const { mode = "full", topics = [] } = req.body || {};
+
+    console.log("START HIT");
+    console.log("MODE:", mode);
+    console.log("TOPICS:", topics);
+
+    const userId = req.user?.uid || "test-user";
+
+    const systemPrompt = generateSystemPrompt(mode, topics);
+    const welcomeMessage = generateWelcomeMessage(mode, topics);
 
     const conversation = new Conversation({
       userId,
+      mode,
+      topics,
       messages: [
         { role: "system", content: systemPrompt },
         { role: "assistant", content: welcomeMessage }
@@ -104,8 +136,8 @@ router.get("/start", verifyFirebaseToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error("START ERROR:", error); // 👈 THIS WILL SHOW REAL PROBLEM
-    res.status(500).json({ reply: "Error starting interview" });
+    console.error("START ERROR:", error);
+    res.status(500).json({ reply: error.message });
   }
 });
 
@@ -179,7 +211,7 @@ router.post("/reset", async (req, res) => {
 
 router.get("/history", verifyFirebaseToken,async (req, res) => {
   try {
-    const userId = req.user.uid || "test-user";
+    const userId = req.user?.uid || "test-user";
 
     const conversations = await Conversation.find({ userId })
       .sort({ createdAt: -1 }); // latest first

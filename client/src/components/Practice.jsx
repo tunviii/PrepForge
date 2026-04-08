@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Editor from "@monaco-editor/react";
-import '../styles/Practice.css';
+import { useLocation } from "react-router-dom";
+import styles from "../styles/Practice.module.css"; // ✅ changed
 
 function Practice({ goBack, token }) {
   const [messages, setMessages] = useState([]);
@@ -11,9 +12,13 @@ function Practice({ goBack, token }) {
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
 
   const bottomRef = useRef(null);
+  const location = useLocation();
+
+  const mode = location.state?.mode || "full";
+  const topics = location.state?.topics || [];
 
   useEffect(() => {
-    if(token){
+    if (token) {
       startChat();
     }
   }, [token]);
@@ -24,10 +29,17 @@ function Practice({ goBack, token }) {
 
   async function startChat() {
     const res = await fetch("http://localhost:5000/api/practice/start", {
+      method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        mode,
+        topics,
+      }),
     });
+
     const data = await res.json();
     setConversationId(data.conversationId);
     setMessages([{ sender: "bot", text: data.reply }]);
@@ -43,18 +55,22 @@ function Practice({ goBack, token }) {
 
     const res = await fetch("http://localhost:5000/api/practice/answer", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({ answer: userMessage, conversationId }),
     });
+
     const data = await res.json();
     setMessages((prev) => [...prev, { sender: "bot", text: data.reply }]);
   }
 
-  fetch("/api/practice/history", {
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
-});
+  useEffect(() => {
+    fetch("/api/practice/history", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }, [token]);
 
   function handleKeyDown(e) {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -68,22 +84,29 @@ function Practice({ goBack, token }) {
       <div className="bg-canvas"></div>
       <div className="grid-overlay"></div>
 
-      <div id="chatSection">
-        <div className="chat-wrapper">
+      <div className={styles.chatSection}>
+        <div className={styles.chatWrapper}>
 
           {/* HEADER */}
-          <div className="chat-header">
-            <button className="back-btn" onClick={goBack}>← Back</button>
-            <div className="chat-title">Practice Mode</div>
+          <div className={styles.chatHeader}>
+            <button className={styles.backBtn} onClick={goBack}>
+              ← Back
+            </button>
+            <div className={styles.chatTitle}>Practice Mode</div>
           </div>
 
           {/* CHAT CONTAINER */}
-          <div className="chat-container">
+          <div className={styles.chatContainer}>
 
             {/* MESSAGES */}
-            <div className="chat-box">
+            <div className={styles.chatBox}>
               {messages.map((msg, index) => (
-                <div key={index} className={`message ${msg.sender}`}>
+                <div
+                  key={index}
+                  className={`${styles.message} ${
+                    msg.sender === "bot" ? styles.bot : styles.user
+                  }`}
+                >
                   {msg.text?.split("\n").map((line, i) => (
                     <p key={i}>{line}</p>
                   ))}
@@ -93,10 +116,10 @@ function Practice({ goBack, token }) {
             </div>
 
             {/* INPUT AREA */}
-            <div className="input-area">
+            <div className={styles.inputArea}>
 
               <button
-                className="toggle-ide-btn"
+                className={styles.toggleIdeBtn}
                 onClick={() => setIsIdeOpen(!isIdeOpen)}
               >
                 {isIdeOpen ? "✕ Close Editor" : "⌨ Open Code Editor"}
@@ -108,16 +131,16 @@ function Practice({ goBack, token }) {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Type your answer… (Enter to send, Shift+Enter for new line)"
-                  className="chat-textarea"
+                  className={styles.chatTextarea}
                 />
               )}
 
               {isIdeOpen && (
-                <div className="ide-container">
+                <div className={styles.ideContainer}>
                   <select
                     value={selectedLanguage}
                     onChange={(e) => setSelectedLanguage(e.target.value)}
-                    className="language-selector"
+                    className={styles.languageSelector}
                   >
                     <option value="javascript">JavaScript</option>
                     <option value="python">Python</option>
@@ -128,6 +151,7 @@ function Practice({ goBack, token }) {
                     <option value="go">Go</option>
                     <option value="rust">Rust</option>
                   </select>
+
                   <Editor
                     height="350px"
                     language={selectedLanguage}
@@ -144,7 +168,7 @@ function Practice({ goBack, token }) {
                 </div>
               )}
 
-              <button className="send-btn" onClick={sendMessage}>
+              <button className={styles.sendBtn} onClick={sendMessage}>
                 Send →
               </button>
 
