@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from '../styles/Landing.module.css';
-import { useNavigate } from "react-router-dom";
-function Landing({ user, logout, openPractice, openInterview, openAuth }) {
+
+function Landing({ user, logout, openPractice, openInterview, openDashboard, openAuth }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   return (
@@ -16,18 +16,25 @@ function Landing({ user, logout, openPractice, openInterview, openAuth }) {
           <div className={styles.logoText}>Prep<span className={styles.accent}>Forge</span></div>
         </div>
 
-        <div className={styles.navRight}>
-          {!user ? (
-            <button className={styles.registerBtn} onClick={openAuth}>
-              Get Started →
-            </button>
-          ) : (
-            <div className={styles.profileContainer}>
-              <div
-                className={styles.profileCircle}
-                onClick={() => setMenuOpen(!menuOpen)}
-              >
-                {(user?.name || user?.email || "U")[0].toUpperCase()}
+      {/* ── TOP RIGHT AUTH ── */}
+      <div className="top-right">
+        {!user ? (
+          <button className="register-btn" onClick={openAuth}>
+            Get Started →
+          </button>
+        ) : (
+          <div className="profile-container">
+            <div
+              className="profile-circle"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {(user?.name || user?.email || "U")[0].toUpperCase()}
+            </div>
+            {menuOpen && (
+              <div className="dropdown">
+                <div onClick={() => alert("Leaderboard coming soon")}>🏆 Leaderboard</div>
+                <div onClick={openDashboard}>📊 Your Progress</div>
+                <div onClick={logout}>🚪 Logout</div>
               </div>
               {menuOpen && (
                 <div className={styles.dropdown}>
@@ -44,7 +51,7 @@ function Landing({ user, logout, openPractice, openInterview, openAuth }) {
       </nav>
 
       {/* ── LANDING SECTION ── */}
-      <div id="landingSection" className={styles.landingSection}>
+      <div className={styles.landingSection}>
         <div className={styles.container}>
 
           {/* HERO */}
@@ -73,15 +80,13 @@ function Landing({ user, logout, openPractice, openInterview, openAuth }) {
           <div className={styles.cards}>
 
             {/* PRACTICE CARD */}
-            <div className={`${styles.card} ${styles.clickable}`} onClick={openPractice}>
+            <div className={styles.card} onClick={openPractice}>
               <div className={styles.cardGlow}></div>
               <span className={`${styles.modeBadge} ${styles.free}`}>Free</span>
-              <div className={styles.cardHeader}>
-                <div className={styles.cardIconWrap}>📘</div>
-                <div className={styles.cardTitleText}>Practice Mode</div>
-              </div>
+              <div className={styles.cardIconWrap}>📘</div>
+              <div className={styles.cardTitleText}>Practice Mode</div>
               <p className={styles.cardDesc}>Learn at your own pace with instant feedback after every answer.</p>
-              <ul className={styles.cardList}>
+              <ul>
                 <li>DSA, behavioral &amp; HR questions</li>
                 <li>Get scored after every answer</li>
                 <li>See improved sample answers</li>
@@ -99,15 +104,13 @@ function Landing({ user, logout, openPractice, openInterview, openAuth }) {
             </div>
 
             {/* TEST CARD */}
-            <div className={`${styles.card} ${styles.clickable}`} onClick={openInterview}>
+            <div className={styles.card} onClick={openInterview}>
               <div className={styles.cardGlow}></div>
               <span className={`${styles.modeBadge} ${styles.pro}`}>Simulated</span>
-              <div className={styles.cardHeader}>
-                <div className={styles.cardIconWrap}>📋</div>
-                <div className={styles.cardTitleText}>Test Mode</div>
-              </div>
+              <div className={styles.cardIconWrap}>📋</div>
+              <div className={styles.cardTitleText}>Test Mode</div>
               <p className={styles.cardDesc}>Simulate a real 45–60 min company-specific interview under pressure.</p>
-              <ul className={styles.cardList}>
+              <ul>
                 <li>4–5 mixed-round questions</li>
                 <li>No hints during interview</li>
                 <li>Comprehensive final report</li>

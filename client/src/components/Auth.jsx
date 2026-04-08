@@ -13,6 +13,7 @@ function Auth({ goBack }) {
   const [branch,setBranch] = useState("");
   const [password,setPassword] = useState("");
 
+  
   const handleSignup = async () => {
 
     if(!name || !email || !college || !branch || !password){
@@ -74,29 +75,15 @@ function Auth({ goBack }) {
 const handleGoogleLogin = async () => {
   const result = await loginWithGoogle();
 
-  if (result.success) {
-    const user = result.user;
-    const token = await user.getIdToken();
-
-    await fetch("http://localhost:5000/api/users/profile", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        name: user.displayName,
-        college: "",
-        branch: ""
-      })
-    });
-
-    alert("Google login successful");
-    goBack();
-  } else {
+  if (!result.success) {
     alert(result.message);
+    return;
   }
+
+  alert("Login successful");
+  goBack();
 };
+
 
   return (
 
