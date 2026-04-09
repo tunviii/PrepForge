@@ -12,9 +12,7 @@ import PracticeMode from './components/PracticeMode';
 import Topics from './components/Topics';
 import Auth from "./components/Auth";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Dashboard from "./components/Dashboard";
-import PracticeMode from "./components/PracticeMode";
-import Topics from "./components/Topics";
+
 
 import { auth } from "./firebase/firebase";
 import { getCurrentUser, logoutUser } from "./services/auth";
@@ -26,45 +24,38 @@ function App() {
   const navigate = useNavigate();
 
 useEffect(() => {
-
   const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-
     if (firebaseUser) {
-
       const token = await firebaseUser.getIdToken();
+
       setToken(token);
       setUid(firebaseUser.uid);
-      try {
 
-          if (data) {
-            setUser(data);
-          } else {
-            setUser({
-              name: firebaseUser.displayName,
-              email: firebaseUser.email,
-            });
-          }
-        } catch (err) {
+      try {
+        const data = await getCurrentUser();
+
+        if (data) {
+          setUser(data);
+        } else {
           setUser({
             name: firebaseUser.displayName,
             email: firebaseUser.email,
           });
         }
-      } else {
-        setUser(null);
+      } catch (err) {
+        setUser({
+          name: firebaseUser.displayName,
+          email: firebaseUser.email,
+        });
       }
-    });
-
     } else {
       setUser(null);
       setToken(null);
       setUid(null);
     }
-
   });
 
-  return unsubscribe;
-
+  return () => unsubscribe();
 }, []);
 
   const logout = async () => {
