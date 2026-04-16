@@ -1,94 +1,202 @@
-export async function generateReport({ questions, answerTranscripts, interviewLog, currentQuestion }) {
-  const answeredCount = Math.min(currentQuestion + 1, questions.length);
-  const totalTime = interviewLog.reduce((s, x) => s + (x.timeSpent || 0), 0);
+const ANTHROPIC_API_KEY = "YOUR_API_KEY_HERE";
 
-  const transcriptSummary = questions
-    .map((q, i) => {
-      const transcript = answerTranscripts[i];
-      const timeSpent = interviewLog[i] ? interviewLog[i].timeSpent : 0;
-      if (!transcript || transcript === '(no speech detected)') {
-        return `Q${i + 1}: "${q}"\nCandidate answer: [Not answered / no speech detected]\nTime spent: ${timeSpent}s`;
-      }
-      return `Q${i + 1}: "${q}"\nCandidate answer: "${transcript}"\nTime spent: ${timeSpent}s`;
-    })
-    .join('\n\n');
+export async function generateReport({
+  questions,
+  answerTranscripts,
+  interviewLog,
+  currentQuestion
+}) {
+  try {
 
-  const hasRealTranscripts = answerTranscripts.some(
-    (t) => t && t !== '(no speech detected)'
-  );
+    const answeredCount = Math.min(currentQuestion + 1, questions.length);
 
-  const prompt = `You are a senior technical interviewer at a top FAANG-level tech company. You just conducted a real mock interview. Below are the exact questions asked and the candidate's actual spoken answers (transcribed via speech recognition).
+    const totalTime = interviewLog.reduce(
+      (s, x) => s + (x.timeSpent || 0),
+      0
+    );
 
-INTERVIEW DETAILS:
-- Total questions: ${questions.length}
-- Questions with answers: ${answeredCount}
-- Total time used: ~${Math.round(totalTime / 60)} minutes
-- Format: Voice interview — answers were spoken aloud
+    const transcriptSummary = questions
+      .map((q, i) => {
 
-TRANSCRIPT:
+        const transcript = answerTranscripts[i];
+        const timeSpent = interviewLog[i]
+          ? interviewLog[i].timeSpent
+          : 0;
+
+        const wordCount = transcript
+          ? transcript.trim().split(/\s+/).length
+          : 0;
+
+        if (!transcript || transcript === "(no speech detected)") {
+
+          return `Q${i + 1}: "${q}"
+Candidate answer: [Not answered]
+Time spent: ${timeSpent}s
+Word count: 0`;
+
+        }
+
+        return `Q${i + 1}: "${q}"
+Candidate answer: "${transcript}"
+Time spent: ${timeSpent}s
+Word count: ${wordCount}`;
+
+      })
+      .join("\n\n");
+
+    const prompt = `You are a senior technical interviewer at a FAANG-level company.
+
+Evaluate the candidate as if this was a real interview.
+
+Consider:
+• correctness
+• depth of reasoning
+• clarity of explanation
+• communication ability
+• time spent thinking
+• answer completeness
+
+INTERVIEW DETAILS
+Total Questions: ${questions.length}
+Questions Answered: ${answeredCount}
+Total Interview Time: ~${Math.round(totalTime / 60)} minutes
+
+TRANSCRIPT
 ${transcriptSummary}
 
-${
-  hasRealTranscripts
-    ? 'Evaluate the candidate strictly based on their actual spoken answers above. Be specific in your feedback — quote or reference what they said. Score honestly.'
-    : 'NOTE: Speech recognition did not capture answers (possibly due to browser/mic issues). Evaluate based on completion behavior and time spent per question.'
-}
+Return ONLY JSON:
 
-Rules:
-- Score each question out of 20 based on answer quality, depth, and correctness
-- Be specific and honest — if an answer was weak, vague, or wrong, say so
-- For DSA questions, check if they explained the approach, time/space complexity
-- For behavioral, check for structure (STAR method), specifics, and relevance
-- Total score should reflect the weighted average of question scores
-
-Respond ONLY with valid JSON, no markdown, no backticks:
 {
-  "totalScore": <0-100>,
-  "verdict": "<Strong Hire | Hire | Borderline | No Hire>",
-  "summary": "<2-3 honest sentences summarizing overall performance>",
-  "hire": <true or false>,
-  "categories": [
-    {"name": "Technical Knowledge", "score": <0-100>, "note": "<specific observation>"},
-    {"name": "Communication", "score": <0-100>, "note": "<specific observation>"},
-    {"name": "Problem Solving", "score": <0-100>, "note": "<specific observation>"},
-    {"name": "Time Management", "score": <0-100>, "note": "<specific observation>"}
+  "totalScore": number,
+  "confidenceScore": number,
+  "verdict": "Strong Hire | Hire | Borderline | No Hire",
+  "summary": "2-3 sentence summary",
+  "hire": true or false,
+
+  "strengths": [
+    "strength 1",
+    "strength 2"
   ],
-  "questionFeedback": [
-    {"score": <0-20>, "feedback": "<specific feedback referencing what they said>"}
+
+  "weaknesses": [
+    "weakness 1",
+    "weakness 2"
+  ],
+
+  "categories": [
+    {"name":"Technical Knowledge","score":number,"note":"text"},
+    {"name":"Communication","score":number,"note":"text"},
+    {"name":"Problem Solving","score":number,"note":"text"},
+    {"name":"Time Management","score":number,"note":"text"}
+  ],
+
+  "questionFeedback":[
+    {"score":number,"feedback":"text"}
   ]
 }`;
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      messages: [{ role: 'user', content: prompt }],
-    }),
-  });
+    const response = await fetch(
+      "https://api.anthropic.com/v1/messages",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01"
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          messages: [
+            { role: "user", content: prompt }
+          ]
+        })
+      }
+    );
 
-  const data = await response.json();
-  const raw = data.content[0].text.replace(/```json|```/g, '').trim();
-  return JSON.parse(raw);
+    const data = await response.json();
+
+    const raw = data.content[0].text
+      .replace(/```json|```/g, "")
+      .trim();
+
+    let parsed;
+
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      return getFallbackReport(questions);
+    }
+
+    return parsed;
+
+  } catch (err) {
+
+    console.error("Report generation failed:", err);
+    return getFallbackReport(questions);
+
+  }
 }
 
 export function getFallbackReport(questions) {
+
   return {
-    totalScore: 70,
-    verdict: 'Hire',
+
+    totalScore: 65,
+    confidenceScore: 70,
+
+    verdict: "Borderline",
+
     summary:
-      'The candidate completed the interview session. A detailed AI analysis could not be generated at this time, but based on completion behavior the candidate showed reasonable engagement.',
-    hire: true,
-    categories: [
-      { name: 'Technical Knowledge', score: 70, note: 'Unable to evaluate in detail.' },
-      { name: 'Communication',       score: 70, note: 'Candidate engaged with all questions.' },
-      { name: 'Problem Solving',     score: 65, note: 'Unable to evaluate in detail.' },
-      { name: 'Time Management',     score: 75, note: 'Pacing appeared reasonable.' },
+      "The interview completed successfully but AI evaluation could not be generated.",
+
+    hire: false,
+
+    strengths: [
+      "Candidate attempted all questions",
+      "Showed reasonable communication"
     ],
+
+    weaknesses: [
+      "Detailed technical analysis unavailable",
+      "Answers could be more structured"
+    ],
+
+    categories: [
+
+      {
+        name: "Technical Knowledge",
+        score: 65,
+        note: "Detailed evaluation unavailable."
+      },
+
+      {
+        name: "Communication",
+        score: 70,
+        note: "Candidate attempted responses."
+      },
+
+      {
+        name: "Problem Solving",
+        score: 60,
+        note: "Detailed evaluation unavailable."
+      },
+
+      {
+        name: "Time Management",
+        score: 75,
+        note: "Interview pacing appeared normal."
+      }
+
+    ],
+
     questionFeedback: questions.map(() => ({
-      score: 14,
-      feedback: 'Response was recorded. Detailed AI analysis unavailable.',
-    })),
+
+      score: 12,
+
+      feedback:
+        "Response recorded but AI analysis could not be completed."
+
+    }))
   };
 }
