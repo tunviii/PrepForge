@@ -1,21 +1,58 @@
-export function parseEvaluation(messages) {
-  const lastMsg = [...messages].reverse().find(m => m.role === 'assistant');
-  if (!lastMsg) return null;
+export function parseEvaluation(messages, session) {
+  const evalMessages = messages.filter(
+    (m) => m.role === "assistant" && m.evaluation
+  );
 
-  const text = lastMsg.content;
+  if (!evalMessages.length) return null;
 
-  const scoreMatches = [...text.matchAll(/(\d+(?:\.\d+)?)\s*\/\s*10/g)];
-  const scores = scoreMatches.map(m => parseFloat(m[1]));
-  const avgScore = scores.length
-    ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10)
-    : null;
+  const scores = evalMessages.map((m) =>
+    Number.isFinite(Number(m.evaluation.score))
+      ? Number(m.evaluation.score)
+      : 0
+  );
 
-  const verdictMatch = text.match(/(Strong Hire|Hire|Borderline|Reject)/i);
-  const verdict = verdictMatch ? verdictMatch[1] : 'Unknown';
-  const isScored = avgScore !== null && verdict !== 'Unknown';
-  const hire    = isScored? !['Reject', 'Borderline'].includes(verdict): null;
+  const avgScore = Math.round(
+    (scores.reduce((a, b) => a + b, 0) / scores.length) * 10
+  );
 
-  const userMessages = messages.filter(m => m.role === 'user');
+  const topicMap = {};
 
-  return { avgScore, verdict, hire, questionCount: userMessages.length, isScored };
+  evalMessages.forEach((m) => {
+    const { topic, score, correct } = m.evaluation;
+
+    if (!topicMap[topic]) {
+      topicMap[topic] = {
+        topic,
+        questions: 0,
+        correct: 0,
+        score: 0,
+      };
+    }
+
+    topicMap[topic].questions += 1;
+    topicMap[topic].score += score || 0;
+
+    if (correct) topicMap[topic].correct += 1;
+  });
+
+  //  verdict logic
+  const isFull = session.mode === "full";
+  const isCompleted = session.status === "completed";
+
+  let verdict = "Pending";
+  let hire = null;
+
+  if (isFull && isCompleted) {
+    verdict = avgScore >= 70 ? "Hire" : "Reject";
+    hire = avgScore >= 70;
+  }
+
+  return {
+    avgScore,
+    verdict,
+    hire,
+    questionCount: evalMessages.length,
+    isScored: true,
+    topicStats: Object.values(topicMap),
+  };
 }

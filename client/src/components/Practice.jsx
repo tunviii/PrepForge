@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Editor from "@monaco-editor/react";
-import { useLocation } from "react-router-dom";
-import styles from "../styles/Practice.module.css"; // ✅ changed
+import { useLocation, useNavigate } from "react-router-dom";
+import styles from "../styles/Practice.module.css";
 
 function Practice({ goBack, token }) {
   const [messages, setMessages] = useState([]);
@@ -12,65 +12,101 @@ function Practice({ goBack, token }) {
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
 
   const bottomRef = useRef(null);
+  const hasStarted = useRef(false);
+
   const location = useLocation();
+  const navigate = useNavigate();
 
   const mode = location.state?.mode || "full";
   const topics = location.state?.topics || [];
 
+  // ✅ Prevent invalid entry (refresh case)
   useEffect(() => {
-    if (token) {
-      startChat();
+    if (!location.state) {
+      navigate("/practice-mode");
     }
+  }, []);
+
+  // ✅ Start conversation ONCE
+  useEffect(() => {
+    if (!token || hasStarted.current) return;
+
+    hasStarted.current = true;
+    startChat();
   }, [token]);
 
+  // ✅ Auto scroll
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   async function startChat() {
-    const res = await fetch("http://localhost:5000/api/practice/start", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        mode,
-        topics,
-      }),
-    });
+    try {
+      const res = await fetch("http://localhost:5000/api/practice/start", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          mode,
+          topics,
+        }),
+      });
 
-    const data = await res.json();
-    setConversationId(data.conversationId);
-    setMessages([{ sender: "bot", text: data.reply }]);
+      const data = await res.json();
+
+      setConversationId(data.conversationId);
+      setMessages([{ sender: "bot", text: data.reply }]);
+
+    } catch (err) {
+      console.error("Start chat error:", err);
+    }
   }
 
   async function sendMessage() {
     const userMessage = isIdeOpen ? code : input;
+
     if (!userMessage.trim()) return;
 
-    setMessages((prev) => [...prev, { sender: "user", text: userMessage }]);
+    // ✅ BLOCK if conversation not ready
+    if (!conversationId) {
+      console.log("Conversation not ready");
+      return;
+    }
+
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: userMessage }
+    ]);
+
     if (isIdeOpen) setCode("");
     else setInput("");
 
-    const res = await fetch("http://localhost:5000/api/practice/answer", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ answer: userMessage, conversationId }),
-    });
+    try {
+      const res = await fetch("http://localhost:5000/api/practice/answer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          answer: userMessage,
+          conversationId,
+        }),
+      });
 
-    const data = await res.json();
-    setMessages((prev) => [...prev, { sender: "bot", text: data.reply }]);
+      const data = await res.json();
+
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: data.reply }
+      ]);
+
+    } catch (err) {
+      console.error("Send message error:", err);
+    }
   }
-
-  useEffect(() => {
-    fetch("/api/practice/history", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-  }, [token]);
 
   function handleKeyDown(e) {
     if (e.key === "Enter" && !e.shiftKey) {

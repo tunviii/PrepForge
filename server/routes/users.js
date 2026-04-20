@@ -28,20 +28,13 @@ router.post("/profile", verifyFirebaseToken, async (req, res) => {
 
 
     const updatedUser = await User.findOneAndUpdate(
-      { uid },
-      updateFields,
-      {
-        uid,
-        email,
-        name,
-        college,
-        branch
-      },
-      {
-        upsert: true,   // create if not exists
-        new: true       // return updated doc
-      }
-    );
+  { uid },
+  updateFields,
+  {
+    upsert: true,
+    new: true
+  }
+);
 
     res.json({ message: "User saved", user: updatedUser });
 
