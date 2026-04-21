@@ -1,6 +1,5 @@
 import express from "express";
 import { getDashboardData } from "../services/dashboardService.js";
-
 const router = express.Router();
 
 router.get("/", async (req, res) => {

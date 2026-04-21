@@ -3,6 +3,12 @@
    Scoped styles for Landing.jsx
 ═══════════════════════════════════════════════ */
 
+/*
+  Font swap: Syne → Inter (body/UI) + Outfit (display/headings)
+  Add to your index.html or global CSS:
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700;800&display=swap');
+*/
+
 /* ── NAVBAR ── */
 .navbar {
   position: fixed;
@@ -37,16 +43,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Outfit', sans-serif;
   font-weight: 800;
   font-size: 16px;
 }
 
 .logoText {
-  font-family: 'Syne', sans-serif;
-  font-size: 18px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 19px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   color: #fff;
 }
 
@@ -63,10 +69,10 @@
   color: #060a0f;
   border: none;
   border-radius: 10px;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   cursor: pointer;
   transition: opacity 0.2s, transform 0.2s;
 }
@@ -91,7 +97,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Outfit', sans-serif;
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
@@ -118,12 +124,16 @@
 
 .dropdownItem {
   padding: 12px 18px;
-  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
   color: var(--text-mid);
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
-
+.dropdownItem svg {
+  color: #00ff99;
+  font-size: 14px;
+}
 .dropdownItem:hover {
   background: rgba(0, 255, 153, 0.07);
   color: #fff;
@@ -146,6 +156,7 @@
   width: 100%;
   max-width: 860px;
   margin: 0 auto;
+  z-index: 1;
 }
 
 /* ── HERO SECTION ── */
@@ -166,10 +177,11 @@
   background: var(--green-dim);
   border: 1px solid rgba(0, 255, 153, 0.25);
   color: var(--green);
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 600;
   margin-bottom: 28px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -183,12 +195,12 @@
 
 /* ── SITE NAME ── */
 .siteName {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Outfit', sans-serif;
   font-size: clamp(52px, 8vw, 90px);
   font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  margin-bottom: 8px;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-bottom: 10px;
 }
 
 .accent {
@@ -197,22 +209,24 @@
 
 /* ── TAGLINE ── */
 .siteTagline {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(13px, 2vw, 17px);
-  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(13px, 2vw, 16px);
+  font-weight: 500;
   color: var(--text-muted);
-  letter-spacing: 0.16em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   margin-bottom: 24px;
 }
 
 /* ── HERO DESCRIPTION ── */
 .heroDesc {
+  font-family: 'Inter', sans-serif;
   color: var(--text-mid);
-  font-size: 15.5px;
-  line-height: 1.75;
+  font-size: 16px;
+  line-height: 1.8;
   max-width: 580px;
   margin: 0 auto 36px;
+  font-weight: 400;
 }
 
 /* ── FEATURE PILLS ROW ── */
@@ -228,11 +242,13 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  padding: 8px 16px;
+  padding: 8px 18px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 50px;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
+  font-weight: 500;
   color: var(--text-mid);
   transition: border-color 0.2s, color 0.2s;
 }
@@ -244,10 +260,10 @@
 
 /* ── SECTION TITLE ── */
 .sectionTitle {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--text-muted);
   text-align: center;
@@ -294,9 +310,6 @@
   backdrop-filter: blur(16px);
   transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   overflow: hidden;
-}
-
-.card.clickable {
   cursor: pointer;
 }
 
@@ -334,14 +347,6 @@
   pointer-events: none;
 }
 
-/* ── CARD HEADER (icon + title grouped) ── */
-.cardHeader {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 14px;
-}
-
 /* ── CARD ICON ── */
 .cardIconWrap {
   width: 46px;
@@ -354,22 +359,26 @@
   justify-content: center;
   font-size: 22px;
   flex-shrink: 0;
+  margin-bottom: 16px;
 }
 
 /* ── CARD TITLE TEXT ── */
 .cardTitleText {
-  font-family: 'Syne', sans-serif;
-  font-size: 20px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 21px;
   font-weight: 700;
   letter-spacing: -0.01em;
+  margin-bottom: 10px;
 }
 
 /* ── CARD DESCRIPTION ── */
 .cardDesc {
+  font-family: 'Inter', sans-serif;
   color: var(--text-muted);
   font-size: 14px;
-  line-height: 1.65;
+  line-height: 1.7;
   margin-bottom: 22px;
+  font-weight: 400;
 }
 
 /* ── CARD FEATURE LIST ── */
@@ -383,12 +392,14 @@
 }
 
 .cardList li {
+  font-family: 'Inter', sans-serif;
   font-size: 13.5px;
+  font-weight: 400;
   color: #b0bec5;
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .cardList li::before {
@@ -417,10 +428,11 @@
 }
 
 .cardCtaText {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13.5px;
   font-weight: 600;
   color: var(--green);
+  letter-spacing: 0.01em;
 }
 
 /* ── CARD ARROW ── */
@@ -457,8 +469,9 @@
   position: absolute;
   top: 16px;
   right: 16px;
+  font-family: 'Inter', sans-serif;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   padding: 4px 10px;
@@ -506,18 +519,21 @@
 }
 
 .statNum {
-  font-family: 'Syne', sans-serif;
-  font-size: 28px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 30px;
   font-weight: 800;
   color: var(--green);
   letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
 .statLabel {
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
+  font-weight: 500;
   color: var(--text-muted);
-  margin-top: 4px;
-  letter-spacing: 0.06em;
+  margin-top: 5px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -531,10 +547,10 @@
 
 .tickerLabel {
   text-align: center;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--text-muted);
   margin-bottom: 28px;
@@ -604,13 +620,72 @@
 }
 
 .companyName {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: #c8d4e0;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
+.bgCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.bgCanvas::before {
+  content: '';
+  position: absolute;
+  width: 800px;
+  height: 800px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,255,120,0.07) 0%, transparent 70%);
+  top: -200px;
+  left: -200px;
+  animation: drift1 18s ease-in-out infinite alternate;
+}
+
+.bgCanvas::after {
+  content: '';
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,180,255,0.06) 0%, transparent 70%);
+  bottom: -100px;
+  right: -100px;
+  animation: drift2 22s ease-in-out infinite alternate;
+}
+
+@keyframes drift1 {
+  from { transform: translate(0,0) scale(1); }
+  to { transform: translate(80px,60px) scale(1.15); }
+}
+
+@keyframes drift2 {
+  from { transform: translate(0,0) scale(1); }
+  to { transform: translate(-60px,-40px) scale(1.2); }
+}
+
+.gridOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background-image:
+    linear-gradient(rgba(0,255,153,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,153,0.03) 1px, transparent 1px);
+
+  background-size: 60px 60px;
+
+  mask-image: radial-gradient(
+    ellipse 80% 80% at 50% 50%,
+    black 30%,
+    transparent 100%
+  );
+}
 /* ── ANIMATIONS ── */
 @keyframes fadeUp {
   from {

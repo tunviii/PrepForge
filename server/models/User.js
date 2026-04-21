@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  firebaseUid: String,
   name: String,
   email: String,
   college: String,

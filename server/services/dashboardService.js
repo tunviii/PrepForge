@@ -1,7 +1,9 @@
 import Conversation from "../models/Conversation.js";
 import { parseEvaluation } from "./parseEvaluation.js";
+import User from "../models/User.js"; 
 
 export async function getDashboardData(userId) {
+  const user = await User.findOne({ uid: userId });
   const allSessions = await Conversation.find({ userId }).sort({ createdAt: 1 });
 
   const parsed = allSessions.map((session) => {
@@ -9,6 +11,7 @@ export async function getDashboardData(userId) {
     const isScored = evaluation?.isScored ?? false;
 
     return {
+      name: user?.name || "User",
       id: session._id,
       date: session.createdAt,
       totalScore: evaluation?.avgScore ?? 0,
@@ -85,6 +88,7 @@ export async function getDashboardData(userId) {
   }));
 
   return {
+    name: user?.name || "User",
     sessions: completed,
     totalSessions: completed.length,
     avgScore,
