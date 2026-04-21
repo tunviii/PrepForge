@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../styles/Landing.module.css";
+import {
+  FaTrophy,
+  FaDoorOpen,
+  FaChartBar
+} from "react-icons/fa";
 
 function Landing({ user, logout, openPractice, openInterview, openDashboard, openAuth }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -8,6 +13,8 @@ function Landing({ user, logout, openPractice, openInterview, openDashboard, ope
 
   return (
     <>
+    <div className={styles.bgCanvas}></div>
+    <div className={styles.gridOverlay}></div>
       {/* NAVBAR */}
       <nav className={styles.navbar}>
         <div className={styles.navLogo}>
@@ -37,7 +44,7 @@ function Landing({ user, logout, openPractice, openInterview, openDashboard, ope
                     className={styles.dropdownItem}
                     onClick={() => alert("Leaderboard coming soon")}
                   >
-                    🏆 Leaderboard
+                    <FaTrophy />  Leaderboard
                   </div>
 
                   <div
@@ -47,11 +54,11 @@ function Landing({ user, logout, openPractice, openInterview, openDashboard, ope
                       openDashboard();
                     }}
                   >
-                    📊 Your Progress
+                    <FaChartBar />  Your Progress
                   </div>
 
                   <div className={styles.dropdownItem} onClick={logout}>
-                    🚪 Logout
+                    <FaDoorOpen /> Logout
                   </div>
                 </div>
               )}
@@ -185,39 +192,6 @@ function Landing({ user, logout, openPractice, openInterview, openDashboard, ope
             </div>
           </div>
 
-        </div>
-      </div>
-
-      {/* COMPANY TICKER */}
-      <div className={styles.tickerSection}>
-        <div className={styles.tickerLabel}>
-          Prep for questions asked at top companies
-        </div>
-
-        <div className={styles.tickerTrackWrapper}>
-          <div className={styles.tickerFadeLeft}></div>
-          <div className={styles.tickerFadeRight}></div>
-
-          <div className={styles.tickerTrack}>
-            <div className={styles.tickerInner}>
-              {[...companies, ...companies].map((company, i) => (
-                <div className={styles.tickerItem} key={i}>
-                  <div className={styles.companyLogo}>
-                    <img
-                      src={company.logo}
-                      alt={company.name}
-                      width={32}
-                      height={32}
-                      style={{ borderRadius: 6 }}
-                    />
-                  </div>
-                  <span className={styles.companyName}>
-                    {company.name}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </>

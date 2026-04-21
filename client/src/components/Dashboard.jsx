@@ -8,7 +8,8 @@ import {
   FaFire,
   FaBrain,
   FaArrowRight,
-  FaChartLine
+  FaChartLine,
+  FaChartBar
 } from "react-icons/fa";
 import {
   LineChart,
@@ -54,6 +55,7 @@ const Button = ({ children, onClick }) => (
   </button>
 );
 
+
 /* MAIN COMPONENT */
 
 export default function Dashboard() {
@@ -71,10 +73,12 @@ export default function Dashboard() {
           "http://localhost:5000/api/dashboard",
           {
             params: { userId: user.uid },
-          }
+          },
+          
         );
-
+        console.log("API RESPONSE:", res.data);
         setDashboardData(res.data);
+
       } catch (err) {
         console.error(err);
       }
@@ -121,7 +125,7 @@ export default function Dashboard() {
         const date = new Date(start);
         date.setDate(start.getDate() + w * 7 + d);
         const key = date.toISOString().split("T")[0];
-        week.push(map[key] || 0);
+        week.push({ date: key, count: map[key] || 0 });
       }
       weeks.push(week);
     }
@@ -137,6 +141,30 @@ export default function Dashboard() {
     if (v < 6) return styles.heat3;
     return styles.heat4;
   };
+
+  const getMonthLabels = () => {
+  const labels = [];
+  const start = new Date();
+  start.setDate(start.getDate() - 90);
+
+  for (let w = 0; w < 13; w++) {
+    const date = new Date(start);
+    date.setDate(start.getDate() + w * 7);
+
+    const month = date.toLocaleString("default", { month: "short" });
+
+    // Only show when month changes
+    if (w === 0 || month !== labels[labels.length - 1]) {
+      labels.push(month);
+    } else {
+      labels.push("");
+    }
+  }
+
+  return labels;
+};
+
+const monthLabels = getMonthLabels();
 
   /* STREAK CALCULATION */
   const calculateStreak = () => {
@@ -167,12 +195,15 @@ export default function Dashboard() {
   const weakestTopic = weaknesses[0];
 
   return (
+    <>
+    <div className={styles.bgCanvas}></div>
+        <div className={styles.gridOverlay}></div>
     <div className={styles.container}>
       <div className={styles.wrapper}>
         {/* Header */}
         <div>
           <h1 className={styles.title}>
-            Welcome back, <span className={styles.gradient}>User</span>
+            Welcome back, <span className={styles.gradient}>{dashboardData?.name || "User"}</span>
           </h1>
           <p className={styles.subtitle}>Here's your preparation overview</p>
         </div>
@@ -199,21 +230,34 @@ export default function Dashboard() {
         {/* Heatmap */}
         <Card>
           <CardHeader>
-            <CardTitle>🔥 Activity Heatmap (Streak: {streak} days)</CardTitle>
+            <CardTitle><FaFire /> Activity Heatmap (Streak: {streak} days)</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className={styles.heatmap}>
-              {heatmapData.map((week, wi) => (
-                <div key={wi} className={styles.heatColumn}>
-                  {week.map((val, di) => (
-                    <div
-                      key={di}
-                      className={`${styles.heatCell} ${heatColor(val)}`}
-                    />
-                  ))}
-                </div>
-              ))}
-            </div>
+            <div className={styles.heatmapWrapper}>
+  
+  <div className={styles.monthRow}>
+    {monthLabels.map((m, i) => (
+      <span key={i} className={styles.monthLabel}>
+        {m}
+      </span>
+    ))}
+  </div>
+
+  <div className={styles.heatmap}>
+    {heatmapData.map((week, wi) => (
+      <div key={wi} className={styles.heatColumn}>
+        {week.map((cell, di) => (
+          <div
+            key={di}
+            title={`${cell.date} • ${cell.count} activity`}
+            className={`${styles.heatCell} ${heatColor(cell.count)}`}
+          />
+        ))}
+      </div>
+    ))}
+  </div>
+
+</div>
           </CardContent>
         </Card>
 
@@ -240,7 +284,7 @@ export default function Dashboard() {
         {/* Topic Analytics */}
         <Card>
           <CardHeader>
-            <CardTitle>📊 Topic Performance</CardTitle>
+            <CardTitle><FaChartBar /> Topic Performance</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -258,7 +302,7 @@ export default function Dashboard() {
         <div className={styles.grid2}>
           <Card>
             <CardHeader>
-              <CardTitle>🏆 Strengths</CardTitle>
+              <CardTitle><FaTrophy /> Strengths</CardTitle>
             </CardHeader>
             <CardContent>
               {strengths.map((s) => (
@@ -273,7 +317,7 @@ export default function Dashboard() {
 
           <Card>
             <CardHeader>
-              <CardTitle>🎯 Focus Area</CardTitle>
+              <CardTitle><FaBullseye /> Focus Area</CardTitle>
             </CardHeader>
             <CardContent>
               {weaknesses.map((w) => (
@@ -292,5 +336,6 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+    </>
   );
 }
