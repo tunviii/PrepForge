@@ -1,22 +1,24 @@
 import React, { useState, useRef, useEffect } from "react";
-import '../styles/Interview.css';
-import { useNavigate } from 'react-router-dom';
+import styles from "../styles/Interview.module.css";
+import { useNavigate } from "react-router-dom";
+
 function Interview({ goBack }) {
   const videoRef = useRef(null);
-const navigate = useNavigate();
-  const [sessionId, setSessionId]               = useState(null);
-  const [questionText, setQuestionText]         = useState("Click Start Interview to begin");
-  const [currentQuestion, setCurrentQuestion]   = useState(0);
-  const [totalQuestions, setTotalQuestions]     = useState(5);
-  const [timer, setTimer]                       = useState(45 * 60);
-  const [started, setStarted]                   = useState(false);
-  const [isSpeaking, setIsSpeaking]             = useState(false);
-  const [downloadUrl, setDownloadUrl]           = useState("");
+  const navigate = useNavigate();
 
-  const timerRef     = useRef(null);
-  const sessionIdRef = useRef(null);
-  const [mediaRecorder, setMediaRecorder]       = useState(null);
-  const [recordedChunks, setRecordedChunks]     = useState([]);
+  const [sessionId, setSessionId]             = useState(null);
+  const [questionText, setQuestionText]       = useState("Click Start Interview to begin");
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [totalQuestions, setTotalQuestions]   = useState(5);
+  const [timer, setTimer]                     = useState(45 * 60);
+  const [started, setStarted]                 = useState(false);
+  const [isSpeaking, setIsSpeaking]           = useState(false);
+  const [downloadUrl, setDownloadUrl]         = useState("");
+
+  const timerRef      = useRef(null);
+  const sessionIdRef  = useRef(null);
+  const [mediaRecorder, setMediaRecorder]     = useState(null);
+  const [recordedChunks, setRecordedChunks]   = useState([]);
 
   useEffect(() => {
     if (started) startCamera();
@@ -120,128 +122,138 @@ const navigate = useNavigate();
   };
 
   const endInterview = async () => {
-  try {
-    clearInterval(timerRef.current);
-    speak("Interview ended. Thank you.");
-    stopRecording();
-    stopCamera();
-    if (sessionIdRef.current) {
-      await fetch("http://localhost:5000/api/interview/end", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId: sessionIdRef.current }),
-      });
+    try {
+      clearInterval(timerRef.current);
+      speak("Interview ended. Thank you.");
+      stopRecording();
+      stopCamera();
+      if (sessionIdRef.current) {
+        await fetch("http://localhost:5000/api/interview/end", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId: sessionIdRef.current }),
+        });
+      }
+    } catch (error) {
+      console.error("End interview error:", error);
     }
-  } catch (error) {
-    console.error("End interview error:", error);
-  }
 
-  navigate('/report', {
-    state: {
-      questions: [questionText],   // or however you track all questions
-      answerTranscripts: [],
-      interviewLog: [],
-      currentQuestion,
-    }
-  });
-};
-const minutes = Math.floor(timer / 60);
-const seconds = timer % 60;
+    navigate("/report", {
+      state: {
+        questions: [questionText],
+        answerTranscripts: [],
+        interviewLog: [],
+        currentQuestion,
+      },
+    });
+  };
+
+  const minutes = Math.floor(timer / 60);
+  const seconds = timer % 60;
+
   /* ── PRE-START LANDING VIEW ── */
   if (!started) {
     return (
       <>
-        <div className="bg-glow"></div>
-        <div className="grid-bg"></div>
+        <div className={styles.interviewPage}>
 
-        <div id="interview-page">
-          <nav className="nav">
-            <div className="nav-logo">
-              <div className="logo-mark">P</div>
-              <div className="logo-text">Prep<span>Forge</span></div>
+          {/* NAVBAR */}
+          <nav className={styles.navbar}>
+            <div className={styles.navLogo}>
+              <div className={styles.logoMark}>P</div>
+              <div className={styles.logoText}>
+                Prep<span className={styles.accent}>Forge</span>
+              </div>
             </div>
-            <div className="nav-badge">
-              <div className="badge-dot"></div>
+
+            <div className={styles.navBadge}>
+              <div className={styles.badgeDot}></div>
               AI Interviewer Ready
             </div>
-            <button className="nav-back" onClick={goBack}>← Back</button>
+
+            <button className={styles.navBack} onClick={goBack}>← Back</button>
           </nav>
 
-          <div className="main">
-            <div className="layout">
+          {/* MAIN */}
+          <div className={styles.main}>
+            <div className={styles.layout}>
 
-              <div className="left">
-                <div className="eyebrow">🔴 Live Simulation Mode</div>
-                <h1 className="big-title">
+              {/* LEFT */}
+              <div className={styles.left}>
+                <div className={styles.eyebrow}>🔴 Live Simulation Mode</div>
+
+                <h1 className={styles.bigTitle}>
                   Mock Interview
-                  <span className="accent">Test Mode</span>
+                  <span className={styles.accentBlock}>Test Mode</span>
                 </h1>
-                <p className="desc">
+
+                <p className={styles.desc}>
                   Step into a high-stakes simulation. Our AI asks, challenges, and
                   evaluates you — exactly like real rounds at Google, Amazon, and Meta.
                 </p>
 
-                <div className="pill-list">
+                <div className={styles.pillList}>
                   {[
-                    { emoji: "⏱️", title: "Timed Interview",          sub: "Real clock pressure — no pausing allowed" },
-                    { emoji: "🧠", title: "AI Evaluation",            sub: "Instant scoring after each response" },
-                    { emoji: "📊", title: "Full Performance Report",  sub: "Detailed breakdown + hire recommendation" },
+                    { emoji: "⏱️", title: "Timed Interview",            sub: "Real clock pressure — no pausing allowed" },
+                    { emoji: "🧠", title: "AI Evaluation",              sub: "Instant scoring after each response" },
+                    { emoji: "📊", title: "Full Performance Report",    sub: "Detailed breakdown + hire recommendation" },
                     { emoji: "🏢", title: "Company-Specific Questions", sub: "DSA, behavioral, HR & system design" },
                   ].map(({ emoji, title, sub }) => (
-                    <div className="pill-item" key={title}>
-                      <span className="pill-emoji">{emoji}</span>
-                      <div className="pill-body">
-                        <div className="pill-title">{title}</div>
-                        <div className="pill-sub">{sub}</div>
+                    <div className={styles.pillItem} key={title}>
+                      <span className={styles.pillEmoji}>{emoji}</span>
+                      <div className={styles.pillBody}>
+                        <div className={styles.pillTitle}>{title}</div>
+                        <div className={styles.pillSub}>{sub}</div>
                       </div>
-                      <div className="pill-check">
+                      <div className={styles.pillCheck}>
                         <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" /></svg>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="cta-section">
-                  <button className="start-btn" onClick={startInterview}>
-                    <span className="btn-icon">🚀</span>
+                <div className={styles.ctaSection}>
+                  <button className={styles.startBtn} onClick={startInterview}>
+                    <span className={styles.btnIcon}>🚀</span>
                     Start Interview Now
                   </button>
-                  <div className="cta-note">No hints &nbsp;·&nbsp; No retries &nbsp;·&nbsp; Just you vs the AI</div>
+                  <div className={styles.ctaNote}>No hints &nbsp;·&nbsp; No retries &nbsp;·&nbsp; Just you vs the AI</div>
                 </div>
               </div>
 
-              <div className="right">
-                <div className="mic-hero">
-                  <div className="mic-aura">
-                    <div className="mic-ring"></div>
-                    <div className="mic-ring"></div>
-                    <div className="mic-ring"></div>
-                    <div className="mic-circle">🎤</div>
+              {/* RIGHT */}
+              <div className={styles.right}>
+                <div className={styles.micHero}>
+                  <div className={styles.micAura}>
+                    <div className={styles.micRing}></div>
+                    <div className={styles.micRing}></div>
+                    <div className={styles.micRing}></div>
+                    <div className={styles.micCircle}>🎤</div>
                   </div>
-                  <div className="mic-label">AI Interviewer is Live</div>
-                  <div className="mic-sub">Waiting for you to begin your session</div>
+                  <div className={styles.micLabel}>AI Interviewer is Live</div>
+                  <div className={styles.micSub}>Waiting for you to begin your session</div>
                 </div>
 
-                <div className="stats-row">
-                  <div className="stat-box">
-                    <div className="stat-icon">🗂️</div>
-                    <div className="stat-val">4–5</div>
-                    <div className="stat-label">Questions</div>
+                <div className={styles.statsRow}>
+                  <div className={styles.statBox}>
+                    <div className={styles.statIcon}>🗂️</div>
+                    <div className={styles.statVal}>4–5</div>
+                    <div className={styles.statLabel}>Questions</div>
                   </div>
-                  <div className="stat-box">
-                    <div className="stat-icon">🕐</div>
-                    <div className="stat-val">45–60<span>min</span></div>
-                    <div className="stat-label">Duration</div>
+                  <div className={styles.statBox}>
+                    <div className={styles.statIcon}>🕐</div>
+                    <div className={styles.statVal}>45–60<span>min</span></div>
+                    <div className={styles.statLabel}>Duration</div>
                   </div>
-                  <div className="stat-box">
-                    <div className="stat-icon">⭐</div>
-                    <div className="stat-val">100</div>
-                    <div className="stat-label">Max Score</div>
+                  <div className={styles.statBox}>
+                    <div className={styles.statIcon}>⭐</div>
+                    <div className={styles.statVal}>100</div>
+                    <div className={styles.statLabel}>Max Score</div>
                   </div>
                 </div>
 
-                <div className="warn-bar">
-                  <span className="warn-icon">⚠️</span>
+                <div className={styles.warnBar}>
+                  <span className={styles.warnIcon}>⚠️</span>
                   Once started, the timer cannot be paused. Treat this like a real interview.
                 </div>
               </div>
@@ -249,17 +261,19 @@ const seconds = timer % 60;
             </div>
           </div>
 
-          <div className="bottom-bar">
-            <div className="bottom-item"><span>💻</span> DSA &amp; Algorithms</div>
-            <div className="bottom-sep"></div>
-            <div className="bottom-item"><span>🧠</span> Behavioral</div>
-            <div className="bottom-sep"></div>
-            <div className="bottom-item"><span>👔</span> HR Rounds</div>
-            <div className="bottom-sep"></div>
-            <div className="bottom-item"><span>🏗️</span> System Design</div>
-            <div className="bottom-sep"></div>
-            <div className="bottom-item"><span>🏢</span> Company-Specific</div>
+          {/* BOTTOM BAR */}
+          <div className={styles.bottomBar}>
+            <div className={styles.bottomItem}><span>💻</span> DSA &amp; Algorithms</div>
+            <div className={styles.bottomSep}></div>
+            <div className={styles.bottomItem}><span>🧠</span> Behavioral</div>
+            <div className={styles.bottomSep}></div>
+            <div className={styles.bottomItem}><span>👔</span> HR Rounds</div>
+            <div className={styles.bottomSep}></div>
+            <div className={styles.bottomItem}><span>🏗️</span> System Design</div>
+            <div className={styles.bottomSep}></div>
+            <div className={styles.bottomItem}><span>🏢</span> Company-Specific</div>
           </div>
+
         </div>
       </>
     );
@@ -268,44 +282,45 @@ const seconds = timer % 60;
   /* ── LIVE INTERVIEW VIEW ── */
   return (
     <>
-      <div className="bg-glow"></div>
-      <div className="grid-bg"></div>
+      <div className={styles.interviewPage}>
 
-      <div id="interview-page">
-
-        {/* NAV — timer shown inline in badge */}
-        <nav className="nav">
-          <div className="nav-logo">
-            <div className="logo-mark">P</div>
-            <div className="logo-text">Prep<span>Forge</span></div>
+        {/* NAV */}
+        <nav className={styles.navbar}>
+          <div className={styles.navLogo}>
+            <div className={styles.logoMark}>P</div>
+            <div className={styles.logoText}>
+              Prep<span className={styles.accent}>Forge</span>
+            </div>
           </div>
-          <div className="nav-badge">
-            <div className="badge-dot"></div>
+
+          <div className={styles.navBadge}>
+            <div className={styles.badgeDot}></div>
             Live &nbsp;·&nbsp; {minutes}:{seconds.toString().padStart(2, "0")}
           </div>
-          <button className="nav-back" onClick={goBack}>← Exit</button>
+
+          <button className={styles.navBack} onClick={goBack}>← Exit</button>
         </nav>
 
         {/* FULL-SCREEN LIVE SCREEN */}
-        <div id="liveScreen">
+        <div className={styles.liveScreen}>
 
           {/* QUESTION BAR */}
-          <div className="question-bar">
+          <div className={styles.questionBar}>
 
-            <div className="qbar-num">Q {currentQuestion} / {totalQuestions}</div>
+            <div className={styles.qbarNum}>Q {currentQuestion} / {totalQuestions}</div>
 
-            <div className="qbar-text">{questionText}</div>
+            <div className={styles.qbarText}>{questionText}</div>
 
-            <div className="qbar-actions">
+            <div className={styles.qbarActions}>
               <button
-                className="qbtn qbtn-next"
+                className={`${styles.qbtn} ${styles.qbtnNext}`}
                 onClick={nextQuestion}
                 disabled={currentQuestion === 0}
               >
                 ⏭ Next
               </button>
               <button
-                className="qbtn qbtn-end"
+                className={`${styles.qbtn} ${styles.qbtnEnd}`}
                 onClick={endInterview}
                 disabled={currentQuestion === 0}
               >
@@ -313,7 +328,7 @@ const seconds = timer % 60;
               </button>
               {downloadUrl && (
                 <a
-                  className="qbtn-download visible"
+                  className={`${styles.qbtnDownload} ${styles.visible}`}
                   href={downloadUrl}
                   download="interview_recording.webm"
                 >
@@ -322,46 +337,43 @@ const seconds = timer % 60;
               )}
             </div>
 
-            {/* AI speaking indicator — visible only while AI is reading aloud */}
-            <div className={`qbar-speak${isSpeaking ? " active" : ""}`}>
-              <div className="speak-bars">
-                <div className="speak-bar"></div>
-                <div className="speak-bar"></div>
-                <div className="speak-bar"></div>
-                <div className="speak-bar"></div>
-                <div className="speak-bar"></div>
+            {/* AI speaking indicator */}
+            <div className={`${styles.qbarSpeak}${isSpeaking ? ` ${styles.active}` : ""}`}>
+              <div className={styles.speakBars}>
+                <div className={styles.speakBar}></div>
+                <div className={styles.speakBar}></div>
+                <div className={styles.speakBar}></div>
+                <div className={styles.speakBar}></div>
+                <div className={styles.speakBar}></div>
               </div>
-              <span className="speak-lbl">AI Speaking</span>
+              <span className={styles.speakLbl}>AI Speaking</span>
             </div>
 
           </div>
 
-          {/* CAMERA — fills the rest of the screen */}
-          <div className="cam-area">
+          {/* CAMERA */}
+          <div className={styles.camArea}>
             <video ref={videoRef} autoPlay playsInline />
 
-            {/* corner brackets */}
-            <div className="vid-corner-tl"></div>
-            <div className="vid-corner-tr"></div>
-            <div className="vid-corner-bl"></div>
-            <div className="vid-corner-br"></div>
+            <div className={styles.vidCornerTl}></div>
+            <div className={styles.vidCornerTr}></div>
+            <div className={styles.vidCornerBl}></div>
+            <div className={styles.vidCornerBr}></div>
 
-            {/* user mic indicator */}
-            <div className="user-mic">
-              <div className="user-mic-bars">
-                <div className="user-mic-bar"></div>
-                <div className="user-mic-bar"></div>
-                <div className="user-mic-bar"></div>
-                <div className="user-mic-bar"></div>
-                <div className="user-mic-bar"></div>
+            <div className={styles.userMic}>
+              <div className={styles.userMicBars}>
+                <div className={styles.userMicBar}></div>
+                <div className={styles.userMicBar}></div>
+                <div className={styles.userMicBar}></div>
+                <div className={styles.userMicBar}></div>
+                <div className={styles.userMicBar}></div>
               </div>
-              <span className="user-mic-lbl">Listening…</span>
+              <span className={styles.userMicLbl}>Listening…</span>
             </div>
 
-            {/* recording tag */}
-            <div className="vid-live-tag">
-              <div className="live-dot"></div>
-              <span className="vid-live-text">RECORDING</span>
+            <div className={styles.vidLiveTag}>
+              <div className={styles.liveDot}></div>
+              <span className={styles.vidLiveText}>RECORDING</span>
             </div>
           </div>
 
