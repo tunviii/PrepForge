@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import styles from "../styles/Interview.module.css";
 import { useNavigate } from "react-router-dom";
+import { useSpeechRecognition } from "../fallback/hooks/useSpeechRecognition";
 
 function Interview({ goBack }) {
   const videoRef = useRef(null);
@@ -14,11 +15,24 @@ function Interview({ goBack }) {
   const [started, setStarted]                 = useState(false);
   const [isSpeaking, setIsSpeaking]           = useState(false);
   const [downloadUrl, setDownloadUrl]         = useState("");
+  const [feedback, setFeedback]               = useState("");
 
   const timerRef      = useRef(null);
   const sessionIdRef  = useRef(null);
   const [mediaRecorder, setMediaRecorder]     = useState(null);
   const [recordedChunks, setRecordedChunks]   = useState([]);
+
+  // Speech recognition hook from File 2
+  const {
+    isListening,
+    startListening,
+    stopListening,
+    getTranscripts,
+  } = useSpeechRecognition({
+    currentQuestion,
+    totalQuestions,
+    interviewEnded: false,
+  });
 
   useEffect(() => {
     if (started) startCamera();
@@ -50,7 +64,7 @@ function Interview({ goBack }) {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
       if (videoRef.current) videoRef.current.srcObject = stream;
       const recorder = new MediaRecorder(stream);
       recorder.ondataavailable = (e) => {
@@ -72,6 +86,16 @@ function Interview({ goBack }) {
     }
   };
 
+  // AI response parser from File 2
+  function parseAIResponse(text) {
+    const feedbackMatch = text.match(/Feedback:\s*(.*?)(?=Next Question:|$)/s);
+    const questionMatch = text.match(/Next Question:\s*(.*)/s);
+    return {
+      feedback: feedbackMatch?.[1]?.trim() || "",
+      question: questionMatch?.[1]?.trim() || text,
+    };
+  }
+
   const startInterview = async () => {
     try {
       const res  = await fetch("http://localhost:5000/api/interview/start", {
@@ -79,15 +103,22 @@ function Interview({ goBack }) {
         headers: { "Content-Type": "application/json" },
       });
       const data = await res.json();
+
+      //  Use parseAIResponse like File 2
+      const parsed = parseAIResponse(data.message ?? data.question ?? "");
+
       if (data.finished) { endInterview(); return; }
+
       setSessionId(data.sessionId);
       sessionIdRef.current = data.sessionId;
-      setQuestionText(data.question);
+      setQuestionText(parsed.question || data.question);
+      setFeedback(parsed.feedback);
       setCurrentQuestion(data.currentQuestion);
-      setTotalQuestions(data.totalQuestions);
+      setTotalQuestions(data.totalQuestions ?? totalQuestions);
       setStarted(true);
       startTimer(data.duration);
-      speak(data.question);
+      speak(parsed.question || data.question);
+      startListening(); // 🎤 Start listening for user's answer
     } catch (error) {
       console.error("Start interview error:", error);
     }
@@ -96,16 +127,26 @@ function Interview({ goBack }) {
   const nextQuestion = async () => {
     if (!sessionIdRef.current) return;
     try {
+      //  Stop listening and grab transcript from File 2 logic
+      stopListening(currentQuestion - 1);
+      const transcripts = getTranscripts();
+      const answer = transcripts[currentQuestion - 1] || "";
+
       const res  = await fetch("http://localhost:5000/api/interview/next", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId: sessionIdRef.current }),
+        body: JSON.stringify({ sessionId: sessionIdRef.current, answer }),
       });
       const data = await res.json();
       if (data.finished) { endInterview(); return; }
-      setQuestionText(data.question);
+
+      const parsed = parseAIResponse(data.message ?? data.question ?? "");
+
+      setQuestionText(parsed.question || data.question);
+      setFeedback(parsed.feedback);
       setCurrentQuestion(data.currentQuestion);
-      speak(data.question);
+      speak(parsed.question || data.question);
+      startListening(); // 🎤 Restart listening for next answer
     } catch (error) {
       console.error("Next question error:", error);
     }
@@ -125,6 +166,7 @@ function Interview({ goBack }) {
     try {
       clearInterval(timerRef.current);
       speak("Interview ended. Thank you.");
+      stopListening(currentQuestion - 1); //  Stop speech recognition
       stopRecording();
       stopCamera();
       if (sessionIdRef.current) {
@@ -144,6 +186,7 @@ function Interview({ goBack }) {
         answerTranscripts: [],
         interviewLog: [],
         currentQuestion,
+        transcripts: getTranscripts(), //  Pass full transcripts like File 2
       },
     });
   };
@@ -311,6 +354,14 @@ function Interview({ goBack }) {
 
             <div className={styles.qbarText}>{questionText}</div>
 
+            {/* ✅ Feedback panel — only shown when there is feedback from the AI */}
+            {feedback && (
+              <div className={styles.feedbackBar}>
+                <span className={styles.feedbackIcon}>💬</span>
+                <span className={styles.feedbackText}>{feedback}</span>
+              </div>
+            )}
+
             <div className={styles.qbarActions}>
               <button
                 className={`${styles.qbtn} ${styles.qbtnNext}`}
@@ -360,6 +411,7 @@ function Interview({ goBack }) {
             <div className={styles.vidCornerBl}></div>
             <div className={styles.vidCornerBr}></div>
 
+            {/*  Mic indicator reflects real isListening state from the hook */}
             <div className={styles.userMic}>
               <div className={styles.userMicBars}>
                 <div className={styles.userMicBar}></div>
@@ -368,7 +420,7 @@ function Interview({ goBack }) {
                 <div className={styles.userMicBar}></div>
                 <div className={styles.userMicBar}></div>
               </div>
-              <span className={styles.userMicLbl}>Listening…</span>
+              <span className={styles.userMicLbl}>{isListening ? "Listening…" : "Paused"}</span>
             </div>
 
             <div className={styles.vidLiveTag}>
