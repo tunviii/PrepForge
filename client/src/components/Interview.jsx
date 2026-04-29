@@ -64,7 +64,7 @@ function Interview({ goBack }) {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       if (videoRef.current) videoRef.current.srcObject = stream;
       const recorder = new MediaRecorder(stream);
       recorder.ondataavailable = (e) => {
@@ -125,32 +125,33 @@ function Interview({ goBack }) {
   };
 
   const nextQuestion = async () => {
-    if (!sessionIdRef.current) return;
-    try {
-      //  Stop listening and grab transcript from File 2 logic
-      stopListening(currentQuestion - 1);
-      const transcripts = getTranscripts();
-      const answer = transcripts[currentQuestion - 1] || "";
+  if (!sessionIdRef.current) return;
+  try {
+    // ✅ FIXED: Use currentQuestion (not currentQuestion - 1) as the save index
+    // currentQuestion is 1-based; we're saving the answer to the CURRENT question
+    stopListening(currentQuestion);
+    const transcripts = getTranscripts();
+    const answer = transcripts[currentQuestion] || '';
 
-      const res  = await fetch("http://localhost:5000/api/interview/next", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId: sessionIdRef.current, answer }),
-      });
-      const data = await res.json();
-      if (data.finished) { endInterview(); return; }
+    const res  = await fetch("http://localhost:5000/api/interview/next", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId: sessionIdRef.current, answer }),
+    });
+    const data = await res.json();
+    if (data.finished) { endInterview(); return; }
 
-      const parsed = parseAIResponse(data.message ?? data.question ?? "");
+    const parsed = parseAIResponse(data.message ?? data.question ?? "");
 
-      setQuestionText(parsed.question || data.question);
-      setFeedback(parsed.feedback);
-      setCurrentQuestion(data.currentQuestion);
-      speak(parsed.question || data.question);
-      startListening(); // 🎤 Restart listening for next answer
-    } catch (error) {
-      console.error("Next question error:", error);
-    }
-  };
+    setQuestionText(parsed.question || data.question);
+    setFeedback(parsed.feedback);
+    setCurrentQuestion(data.currentQuestion);
+    speak(parsed.question || data.question);
+    startListening();
+  } catch (error) {
+    console.error("Next question error:", error);
+  }
+};
 
   const stopRecording = () => {
     if (mediaRecorder && mediaRecorder.state !== "inactive") {

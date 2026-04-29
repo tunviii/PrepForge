@@ -1,30 +1,34 @@
 import { useRef, useState, useCallback } from 'react';
 
 export function useSpeechRecognition({ currentQuestion, totalQuestions, interviewEnded }) {
-  const recognitionRef        = useRef(null);
-  const currentTranscriptRef  = useRef('');
-  const answerTranscriptsRef  = useRef([]);
+  const recognitionRef       = useRef(null);
+  const currentTranscriptRef = useRef('');
+  const answerTranscriptsRef = useRef([]);
   const [isListening, setIsListening] = useState(false);
 
+  // Store latest values in refs so onend/onresult closures are never stale
+  const stateRef = useRef({ currentQuestion, totalQuestions, interviewEnded });
+  stateRef.current = { currentQuestion, totalQuestions, interviewEnded };
+
   const init = useCallback(() => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      console.warn('Speech Recognition not supported. Use Chrome for best results.');
+      console.warn('Speech Recognition not supported. Use Chrome.');
       return;
     }
 
     const r = new SpeechRecognition();
-    r.continuous      = true;
-    r.interimResults  = true;
-    r.lang            = 'en-US';
+    r.continuous     = true;
+    r.interimResults = true;
+    r.lang           = 'en-US';
 
     r.onresult = (event) => {
+      //  FIXED: Single loop only — no nested duplicate
+      let chunk = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          currentTranscriptRef.current += event.results[i][0].transcript + ' ';
-        }
+        chunk += event.results[i][0].transcript;
       }
+      currentTranscriptRef.current += chunk + ' ';
     };
 
     r.onerror = (e) => {
@@ -34,18 +38,20 @@ export function useSpeechRecognition({ currentQuestion, totalQuestions, intervie
     };
 
     r.onend = () => {
-      if (currentQuestion < totalQuestions && !interviewEnded) {
-        try { r.start(); } catch (_) {}
+      //  FIXED: Read from ref, not stale closure
+      const { currentQuestion: cq, totalQuestions: tq, interviewEnded: ended } = stateRef.current;
+      if (cq < tq && !ended) {
+        setTimeout(() => { try { r.start(); } catch (_) {} }, 300);
       }
     };
 
     recognitionRef.current = r;
-  }, [currentQuestion, totalQuestions, interviewEnded]);
+  }, []); //  No dependency array needed — uses stateRef
 
   const startListening = useCallback(() => {
     if (!recognitionRef.current) init();
     if (!recognitionRef.current) return;
-    currentTranscriptRef.current = '';
+    currentTranscriptRef.current = ''; // Reset for new question
     setIsListening(true);
     try { recognitionRef.current.start(); } catch (_) {}
   }, [init]);

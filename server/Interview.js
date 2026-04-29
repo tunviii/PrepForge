@@ -116,31 +116,56 @@ router.post("/start", async (req, res) => {
 
 router.post("/next", async (req, res) => {
   const { sessionId, answer } = req.body;
-
   const session = sessions[sessionId];
 
-  if (!session) {
-    return res.status(400).json({ error: "Invalid session" });
-  }
+  if (!session) return res.status(400).json({ error: "Invalid session" });
 
-  //  Store user answer
-  session.history.push({
-    role: "user",
-    content: answer
-  });
+  // Push user's answer
+  session.history.push({ role: "user", content: answer });
 
-  //  AI generates feedback + next question
+  // Generate AI reply
   const aiReply = await aiService.generateReply(session);
+
+  //  Push AI reply into history so it has memory of what it said
+  session.history.push({ role: "assistant", content: aiReply });
+
+  // Increment the question counter
+  session.questionCount += 1;
 
   res.json({
     message: aiReply,
     currentQuestion: session.questionCount,
-    finished: session.questionCount >= 10
+    finished: session.questionCount >= 10,
   });
 });
 
 router.post("/end", (req, res) => {
   res.json({ message: "Interview ended" });
+});
+
+router.post("/next", async (req, res) => {
+  const { sessionId, answer } = req.body;
+  const session = sessions[sessionId];
+
+  if (!session) return res.status(400).json({ error: "Invalid session" });
+
+  // Push user's answer
+  session.history.push({ role: "user", content: answer });
+
+  // Generate AI reply
+  const aiReply = await aiService.generateReply(session);
+
+  
+  session.history.push({ role: "assistant", content: aiReply });
+
+  
+  session.questionCount += 1;
+
+  res.json({
+    message: aiReply,
+    currentQuestion: session.questionCount,
+    finished: session.questionCount >= 10,
+  });
 });
 
 export default router;
