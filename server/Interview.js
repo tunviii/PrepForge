@@ -1,61 +1,121 @@
 import express from "express";
+import aiService from "./utils/aiService.js"
 
 const router = express.Router();
 global.sessions = global.sessions || {};
 const sessions = global.sessions;
 
-// ================= DSA QUESTIONS =================
-const dsaQuestions = [
-"Two Sum II","3Sum","Longest Substring Without Repeating Characters",
-"Container With Most Water","Group Anagrams","Product of Array Except Self",
-"Longest Palindromic Substring","Search in Rotated Sorted Array",
-"Find Minimum in Rotated Sorted Array","Number of Islands",
-"Course Schedule","Clone Graph","Pacific Atlantic Water Flow",
-"Rotting Oranges","Top K Frequent Elements","Kth Largest Element in Array",
-"Subsets","Permutations","Combination Sum","Word Search",
-"Binary Tree Level Order Traversal","Validate Binary Search Tree",
-"Kth Smallest in BST","Lowest Common Ancestor BST",
-"Binary Tree Right Side View","Construct Binary Tree from Preorder Inorder",
-"Path Sum II","House Robber","House Robber II","Coin Change",
-"Longest Increasing Subsequence","Partition Equal Subset Sum",
-"Jump Game","Jump Game II","Unique Paths","Minimum Path Sum",
-"Decode Ways","Word Break","Longest Common Subsequence",
-"Edit Distance","Longest Consecutive Sequence"
-];
+//========= SYSTEM PROMPT ==============
+  function getSystemPrompt() {
+  return `
+You are a strict campus placement technical interviewer conducting a full mock interview.
+
+INTERVIEW STRUCTURE (exactly 10 questions, follow strictly):
+1–2: Introduction & background  
+3–5: Data Structures & Algorithms (DSA)  
+6–7: CS Fundamentals (OS, CN, OOP)  
+8–9: DBMS  
+10: Behavioral  
+
+CRITICAL RULES:
+- Ask ONLY one question at a time
+- Do NOT skip or reorder sections
+- Increase difficulty gradually
+- Do NOT repeat questions
+- Keep questions realistic (like real placements)
+- ALWAYS start from Question 1
+- DO NOT generate DSA before Question 3
+
+ FIRST MESSAGE (MANDATORY FORMAT):
+
+Greetings! I'm your technical interviewer. Let's begin your interview.
+
+Question 1: Tell me about yourself.
+
+-DO NOT add anything else.
+- DO NOT include feedback in the first message
+- DO NOT include any report or structure
+- DO NOT include extra explanation
+
+Example:
+Greetings! I'm your technical interviewer. Let's begin your interview.
+
+AFTER EACH ANSWER:
+- Give concise feedback (2–3 sentences)
+- Mention what was correct
+- Mention what was missing or weak
+- Suggest improvement
+- Then ask the next question
+
+IMPORTANT:
+- Keep track of question number internally (1–10)
+- After Question 10 answer → DO NOT ask another question
+
+FINAL RESPONSE (after Q10 only):
+
+---
+Interview Complete!
+
+Overall Score: X/10
+
+Section-wise Performance:
+- Introduction: [Score] — [Remark]
+- DSA: [Score] — [Remark]
+- CS Fundamentals: [Score] — [Remark]
+- DBMS: [Score] — [Remark]
+- Behavioral: [Score] — [Remark]
+
+Strengths:
+- Point 1
+- Point 2
+
+Areas to Improve:
+- Point 1 — Improvement
+- Point 2 — Improvement
+
+Final Suggestion:
+1–2 lines of advice
+---
+
+RESPONSE FORMAT (VERY IMPORTANT):
+
+Feedback:
+<your feedback>
+
+Next Question:
+<your next question>
+
+(For final response, ONLY return the report)
+`;
+}
+
 
 // ================= API =================
-router.post("/start", (req, res) => {
-
-  const randomDSA =
-    dsaQuestions[Math.floor(Math.random() * dsaQuestions.length)];
-
-  const questions = [
-    "Tell me about yourself.",
-    "Solve this DSA problem: " + randomDSA,
-    "Explain one technical project you have worked on.",
-    "What is your biggest strength?",
-    "Why should we hire you?"
-  ];
-
+router.post("/start", async (req, res) => {
   const sessionId = Date.now().toString();
 
-  // 🔥 STORE SESSION (THIS WAS MISSING)
+  const systemPrompt = getSystemPrompt();
+
   sessions[sessionId] = {
-    questions,
-    index: 0
+    history: [
+      { role: "system", content: systemPrompt }
+    ],
+    questionCount: 0
   };
+
+  const aiReply = await aiService.generateReply(sessions[sessionId]);
 
   res.json({
     sessionId,
-    question: questions[0],
+    message: aiReply,
     currentQuestion: 1,
-    totalQuestions: questions.length,
+    totalQuestions: 10,
     duration: 45 * 60
   });
 });
 
-router.post("/next", (req, res) => {
-  const { sessionId } = req.body;
+router.post("/next", async (req, res) => {
+  const { sessionId, answer } = req.body;
 
   const session = sessions[sessionId];
 
@@ -63,16 +123,19 @@ router.post("/next", (req, res) => {
     return res.status(400).json({ error: "Invalid session" });
   }
 
-  session.index++;
+  //  Store user answer
+  session.history.push({
+    role: "user",
+    content: answer
+  });
 
-  if (session.index >= session.questions.length) {
-    return res.json({ finished: true });
-  }
+  //  AI generates feedback + next question
+  const aiReply = await aiService.generateReply(session);
 
   res.json({
-    question: session.questions[session.index],
-    currentQuestion: session.index + 1,
-    finished: false
+    message: aiReply,
+    currentQuestion: session.questionCount,
+    finished: session.questionCount >= 10
   });
 });
 
