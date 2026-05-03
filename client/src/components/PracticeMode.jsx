@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "../styles/PracticeMode.module.css"; // ✅ FIX
+import styles from "../styles/PracticeMode.module.css";
 
 function PracticeMode({ goBack }) {
   const navigate = useNavigate();

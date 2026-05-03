@@ -22,7 +22,7 @@ function Interview({ goBack }) {
   const [mediaRecorder, setMediaRecorder]     = useState(null);
   const [recordedChunks, setRecordedChunks]   = useState([]);
 
-  // Speech recognition hook from File 2
+  
   const {
     isListening,
     startListening,
@@ -127,8 +127,7 @@ function Interview({ goBack }) {
   const nextQuestion = async () => {
   if (!sessionIdRef.current) return;
   try {
-    // ✅ FIXED: Use currentQuestion (not currentQuestion - 1) as the save index
-    // currentQuestion is 1-based; we're saving the answer to the CURRENT question
+    
     stopListening(currentQuestion);
     const transcripts = getTranscripts();
     const answer = transcripts[currentQuestion] || '';
@@ -187,7 +186,7 @@ function Interview({ goBack }) {
         answerTranscripts: [],
         interviewLog: [],
         currentQuestion,
-        transcripts: getTranscripts(), //  Pass full transcripts like File 2
+        transcripts: getTranscripts(), 
       },
     });
   };
@@ -355,7 +354,7 @@ function Interview({ goBack }) {
 
             <div className={styles.qbarText}>{questionText}</div>
 
-            {/* ✅ Feedback panel — only shown when there is feedback from the AI */}
+            
             {feedback && (
               <div className={styles.feedbackBar}>
                 <span className={styles.feedbackIcon}>💬</span>

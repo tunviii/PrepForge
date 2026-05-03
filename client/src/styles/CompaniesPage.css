@@ -180,7 +180,7 @@
   height: 40px;
   border-radius: 8px;
   object-fit: contain;
-  background: #fff; /* Ensure logo is visible if it has transparent bg */
+  background: #fff; 
   padding: 4px;
 }
 

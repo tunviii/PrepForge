@@ -20,14 +20,14 @@ function Practice({ goBack, token }) {
   const mode = location.state?.mode || "full";
   const topics = location.state?.topics || [];
 
-  // ✅ Prevent invalid entry (refresh case)
+  
   useEffect(() => {
     if (!location.state) {
       navigate("/practice-mode");
     }
   }, []);
 
-  // ✅ Start conversation ONCE
+  
   useEffect(() => {
     if (!token || hasStarted.current) return;
 
@@ -35,7 +35,7 @@ function Practice({ goBack, token }) {
     startChat();
   }, [token]);
 
-  // ✅ Auto scroll
+  
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -69,7 +69,7 @@ function Practice({ goBack, token }) {
 
     if (!userMessage.trim()) return;
 
-    // ✅ BLOCK if conversation not ready
+    
     if (!conversationId) {
       console.log("Conversation not ready");
       return;
