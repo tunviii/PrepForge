@@ -12,6 +12,7 @@ import PracticeMode from './components/PracticeMode';
 import Topics from './components/Topics';
 import Auth from "./components/Auth";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CompaniesPage from "./components/CompaniesPage";
 
 
 import { auth } from "./firebase/firebase";
@@ -75,7 +76,7 @@ useEffect(() => {
 
   const openInterview = () => {
     if (!user) { navigate("/auth"); return; }
-    navigate("/test");
+    navigate("/companies");
   };
 
   const openDashboard = () => {
@@ -122,10 +123,19 @@ useEffect(() => {
     />
 
     <Route
+      path="/companies"
+      element={
+        <ProtectedRoute user={user}>
+          <CompaniesPage goBack={() => navigate("/")} />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
       path="/test"
       element={
         <ProtectedRoute user={user}>
-          <Interview goBack={() => navigate("/")} />
+          <Interview goBack={() => navigate("/companies")} />
         </ProtectedRoute>
       }
     />
