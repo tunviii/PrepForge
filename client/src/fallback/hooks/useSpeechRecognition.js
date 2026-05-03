@@ -23,7 +23,7 @@ export function useSpeechRecognition({ currentQuestion, totalQuestions, intervie
     r.lang           = 'en-US';
 
     r.onresult = (event) => {
-      //  FIXED: Single loop only — no nested duplicate
+      
       let chunk = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
         chunk += event.results[i][0].transcript;
@@ -38,7 +38,7 @@ export function useSpeechRecognition({ currentQuestion, totalQuestions, intervie
     };
 
     r.onend = () => {
-      //  FIXED: Read from ref, not stale closure
+      
       const { currentQuestion: cq, totalQuestions: tq, interviewEnded: ended } = stateRef.current;
       if (cq < tq && !ended) {
         setTimeout(() => { try { r.start(); } catch (_) {} }, 300);
@@ -46,12 +46,12 @@ export function useSpeechRecognition({ currentQuestion, totalQuestions, intervie
     };
 
     recognitionRef.current = r;
-  }, []); //  No dependency array needed — uses stateRef
+  }, []); 
 
   const startListening = useCallback(() => {
     if (!recognitionRef.current) init();
     if (!recognitionRef.current) return;
-    currentTranscriptRef.current = ''; // Reset for new question
+    currentTranscriptRef.current = ''; 
     setIsListening(true);
     try { recognitionRef.current.start(); } catch (_) {}
   }, [init]);

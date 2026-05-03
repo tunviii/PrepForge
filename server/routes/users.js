@@ -4,7 +4,6 @@ import { verifyFirebaseToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// routes/users.js — add this alongside your existing POST /profile
 
 router.get('/me', verifyFirebaseToken, async (req, res) => {
   try {
